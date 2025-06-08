@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+
+{% block title %}Sun Depot - Calcula tu Ahorro Total en Hogar y Transporte{% endblock %}
+
+{% block content %}
+    <!-- HERO SECTION -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">Descubre el Poder del Sol en tu Hogar</h1>
+            <h2 class="hero-subtitle">Energía Solar y Limpia</h2>
+            <p class="hero-description">
+                Calcula cuántos paneles solares necesitas para reducir tu factura de luz y 
+                contribuir a un planeta más verde. ¡Es fácil y rápido!
+            </p>
+            <a href="#calculator" class="hero-cta">Ir a la Calculadora Solar</a>
+            <div class="hero-stats">
+                <div class="stat-card">
+                    <div class="stat-number">67.3%</div>
+                    <div class="stat-label">Crecimiento Energía Limpia</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">5.5</div>
+                    <div class="stat-label">HSP promedio México</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Deducción ISR</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">25%</div>
+                    <div class="stat-label">Incentivo SENER</div>
+                </div>
+            </div>
+        </div>
+        <svg class="hero-section-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120">
+            <path fill="#ffffff" d="M0,80 C480,20 960,20 1440,80 L1440,120 L0,120 Z"></path>
+        </svg>
+    </section>
+
+    <!-- CALCULADORA -->
+    <section class="calculator-main" id="calculator">
+        <div class="container">
+            <h2 class="section-title">🧮 Calculadora de Ahorro Solar Integral</h2>
+            <p class="section-subtitle">Calcula tu sistema solar para el hogar y vehículo eléctrico</p>
+            
+            <div class="form-grid">
+                <div>
+                    <h3 style="color: #2ECC71; margin-bottom: 1rem;">🏠 Datos del Hogar</h3>
+                    <div class="form-group">
+                        <label for="homeConsumption">Consumo eléctrico bimestral (kWh)</label>
+                        <input type="number" id="homeConsumption" placeholder="Ej: 400" value="400">
+                    </div>
+                    <div class="form-group">
+                        <label for="location">Ubicación (Estado)</label>
+                        <select id="location">
+                            <option value="">Selecciona tu estado</option>
+                            {% for loc in locations %}
+                            <option value="{{ loc.value }}" data-hsp="{{ loc.hsp }}">{{ loc.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="coverage">Porcentaje de cobertura deseado</label>
+                        <select id="coverage">
+                            <option value="50">50% - Básico</option>
+                            <option value="75">75% - Recomendado</option>
+                            <option value="100" selected>100% - Óptimo</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <h3 style="color: #2ECC71; margin-bottom: 1rem;">🚗 Datos del Vehículo (Opcional)</h3>
+                    <div class="form-group">
+                        <label for="vehicleModel">¿Tienes vehículo eléctrico/híbrido?</label>
+                        <select id="vehicleModel">
+                            <option value="">No tengo / No incluir</option>
+                            {% for vehicle in vehicles %}
+                            <option value="{{ vehicle.value }}">{{ vehicle.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group" id="customSpecs" style="display: none;">
+                        <label for="batteryCapacity">Capacidad de Batería (kWh)</label>
+                        <input type="number" id="batteryCapacity" step="0.1" placeholder="Ej: 15.5">
+                    </div>
+                    <div class="form-group" id="dailyKmGroup" style="display: none;">
+                        <label for="dailyEvKm">Kilómetros diarios en modo eléctrico</label>
+                        <input type="number" id="dailyEvKm" placeholder="Ej: 40" value="40">
+                    </div>
+                    <div class="warning-box">
+                        <strong>💡 Tip:</strong> Incluir tu vehículo eléctrico te dará un cálculo más preciso del sistema integral.
+                    </div>
+                </div>
+            </div>
+            <button class="calculate-btn" onclick="calculateIntegral()">⚡ Calcular Mi Sistema Solar Integral</button>
+            <div class="results-section" id="results">
+                <h3 class="section-title">📊 Resultados de tu Sistema Solar</h3>
+                <div class="results-grid" id="resultsGrid"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- EQUIPAMIENTO SOLAR -->
+    <section class="commercial-section" id="equipamiento">
+        <div class="container">
+            <div class="category-header">
+                <h2 class="category-title">☀️ Equipamiento Solar Recomendado</h2>
+                <p class="category-description">Sistemas de paneles solares de calidad certificada con garantías extendidas</p>
+            </div>
+            <div class="partners-container">
+                <div class="partner-tabs">
+                    <button class="partner-tab active" onclick="switchPartner('equipamiento', 'premium')">🏆 Premium</button>
+                    <button class="partner-tab" onclick="switchPartner('equipamiento', 'distribuidores')">🏪 Distribuidores</button>
+                    <button class="partner-tab" onclick="switchPartner('equipamiento', 'fide')">🏛️ Programa FIDE</button>
+                </div>
+                
+                <!-- Contenido estático por ahora -->
+                <div class="partner-content active" id="equipamiento-premium">
+                    <div class="products-grid">
+                        <div class="product-card">
+                            <div class="partner-badge">La Bodega Solar</div>
+                            <div class="product-image">Kit Solar Premium 5kW</div>
+                            <div class="product-info">
+                                <h4 class="product-title">Sistema Solar Residencial 5kW</h4>
+                                <p class="product-price">Desde $95,000 MXN</p>
+                                <p class="product-description">13 paneles de 385W con microinversores. Ideal para hogares con consumo medio-alto.</p>
+                                <div class="product-features">
+                                    <span class="feature-tag">✓ Garantía 25 años</span>
+                                    <span class="feature-tag">✓ Instalación incluida</span>
+                                    <span class="feature-tag">✓ Monitoreo WiFi</span>
+                                </div>
+                                <a href="#" class="cta-button" onclick="trackClick('labodegasolar', 'kit-5kw')">Ver en La Bodega Solar</a>
+                            </div>
+                        </div>
+                        <div class="product-card">
+                            <div class="partner-badge">Solarama</div>
+                            <div class="product-image">Kit Solar 3kW</div>
+                            <div class="product-info">
+                                <h4 class="product-title">Kit Solar Básico 3kW</h4>
+                                <p class="product-price">Desde $65,000 MXN</p>
+                                <p class="product-description">8 paneles de 375W perfecto para iniciar en energía solar.</p>
+                                <div class="product-features">
+                                    <span class="feature-tag">✓ Instalación rápida</span>
+                                    <span class="feature-tag">✓ Trámites CFE</span>
+                                </div>
+                                <a href="#" class="cta-button" onclick="trackClick('solarama', 'kit-3kw')">Cotizar en Solarama</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="partner-content" id="equipamiento-distribuidores">
+                    <div class="products-grid">
+                        <div class="product-card">
+                            <div class="partner-badge">Amazon</div>
+                            <div class="product-image">Paneles Amazon</div>
+                            <div class="product-info">
+                                <h4 class="product-title">Paneles Solares Individuales</h4>
+                                <p class="product-price">Desde $3,500 MXN/panel</p>
+                                <p class="product-description">Paneles solares de alta eficiencia para proyectos DIY.</p>
+                                <a href="#" class="cta-button amazon" onclick="trackClick('amazon', 'paneles-individuales')">Ver en Amazon</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="partner-content" id="equipamiento-fide">
+                    <div class="products-grid">
+                        <div class="product-card">
+                            <div class="partner-badge">FIDE Oficial</div>
+                            <div class="product-image">Programa FIDE</div>
+                            <div class="product-info">
+                                <h4 class="product-title">Sistema FIDE Certificado</h4>
+                                <p class="product-price">25% descuento + financiamiento</p>
+                                <p class="product-description">Programa gubernamental oficial con incentivos máximos.</p>
+                                <a href="#" class="cta-button" onclick="trackClick('fide', 'programa-oficial')">Programa FIDE</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- BENEFICIOS -->
+    <section class="benefits-section">
+        <div class="container">
+            <h2 class="section-title" style="color: white;">🌟 Beneficios de la Sinergia Solar + Vehículo Eléctrico</h2>
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="benefit-icon">💰</div>
+                    <h3 class="benefit-title">Doble Ahorro</h3>
+                    <p>Reduce gastos en gasolina y electricidad doméstica simultáneamente. Ahorra hasta $3,000 MXN mensuales.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">🌱</div>
+                    <h3 class="benefit-title">Cero Emisiones</h3>
+                    <p>Tu vehículo eléctrico funcionará 100% con energía limpia del sol. Contribuye al planeta verde.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">🔋</div>
+                    <h3 class="benefit-title">Independencia Energética</h3>
+                    <p>Genera tu propia electricidad y reduce dependencia de CFE y gasolineras.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">📈</div>
+                    <h3 class="benefit-title">Valor de Propiedad</h3>
+                    <p>Aumenta el valor de tu casa con tecnología sustentable y sistema de carga vehicular.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">⚡</div>
+                    <h3 class="benefit-title">Carga Nocturna Gratuita</h3>
+                    <p>Con baterías solares, carga tu vehículo gratis durante la noche con energía almacenada del día.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">🎯</div>
+                    <h3 class="benefit-title">ROI Acelerado</h3>
+                    <p>El sistema se paga más rápido al cubrir tanto consumo doméstico como de transporte.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- INCENTIVOS -->
+    <section class="incentives-section">
+        <div class="container">
+            <h2 class="section-title" style="color: white;">🎯 Incentivos Gubernamentales Vigentes 2025</h2>
+            <div class="incentive-item">
+                <h3>🚗 Para tu Vehículo Eléctrico/Híbrido:</h3>
+                <ul>
+                    <li>✅ Exención completa del ISAN</li>
+                    <li>✅ Reducción/exención del impuesto sobre tenencia</li>
+                    <li>✅ Exento del "Hoy No Circula"</li>
+                    <li>✅ Sin verificación vehicular</li>
+                </ul>
+            </div>
+            <div class="incentive-item">
+                <h3>☀️ Para tu Sistema Solar:</h3>
+                <ul>
+                    <li>💰 SENER-FIDE: 25% de incentivo directo</li>
+                    <li>🏦 Financiamiento preferencial TIIE + 4.5%</li>
+                    <li>📊 Deducción fiscal del 100% en ISR</li>
+                    <li>⚡ Net Metering con CFE</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- NEWSLETTER -->
+    <section class="newsletter-section">
+        <div class="container">
+            <h3>🚀 ¡Mantente al día con las últimas oportunidades!</h3>
+            <p>Recibe ofertas exclusivas, nuevos productos y tips de ahorro energético</p>
+            <div class="newsletter-form">
+                <input type="email" id="emailNewsletter" placeholder="tu@email.com">
+                <button onclick="subscribeNewsletter()">Suscribirme</button>
+            </div>
+            <p class="newsletter-benefits">✨ Descuento del 10% en tu primera compra · 📊 Calculadoras avanzadas gratis · 🎁 Ebooks exclusivos</p>
+        </div>
+    </section>
+{% endblock %}

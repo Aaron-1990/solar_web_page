@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sun Depot - Calcula tu Ahorro Total{% endblock %}</title>
+    
+    <!-- Meta tags SEO -->
+    <meta name="description" content="{% block description %}Calcula cuántos paneles solares necesitas para tu hogar y vehículo eléctrico. Ahorra en electricidad y gasolina con energía solar.{% endblock %}">
+    <meta name="keywords" content="paneles solares, calculadora solar, energía solar México, vehículo eléctrico, ahorro energético">
+    <meta name="author" content="Sun Depot">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="{% block og_title %}Sun Depot - Calcula tu Ahorro Total{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Descubre cuánto puedes ahorrar con paneles solares en tu hogar y vehículo eléctrico{% endblock %}">
+    <meta property="og:image" content="{{ url_for('static', filename='images/og-image.jpg') }}">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta property="og:type" content="website">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% block twitter_title %}Sun Depot{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}Calcula tu ahorro con energía solar{% endblock %}">
+    <meta name="twitter:image" content="{{ url_for('static', filename='images/twitter-card.jpg') }}">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    {% block extra_css %}{% endblock %}
+    
+    <!-- Google Analytics -->
+    {% if config.GOOGLE_ANALYTICS_ID %}
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ config.GOOGLE_ANALYTICS_ID }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '{{ config.GOOGLE_ANALYTICS_ID }}');
+    </script>
+    {% endif %}
+    
+    <!-- Facebook Pixel -->
+    {% if config.FACEBOOK_PIXEL_ID %}
+    <script>
+        !function(f,b,e,v,n,t,s)
+        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window, document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', '{{ config.FACEBOOK_PIXEL_ID }}');
+        fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+        src="https://www.facebook.com/tr?id={{ config.FACEBOOK_PIXEL_ID }}&ev=PageView&noscript=1"
+    /></noscript>
+    {% endif %}
+</head>
+<body>
+    <!-- Header/Navigation -->
+    <header class="main-header">
+        <nav class="navbar">
+            <div class="container">
+                <a href="{{ url_for('index') }}" class="logo">
+                    <img src="{{ url_for('static', filename='images/logo3.png') }}" alt="Sun Depot Logo">
+                    <div class="logo-text">
+                        <h1 class="logo-name">SUN DEPOT</h1>
+                        <p class="logo-tagline">Premium Solar Solutions</p>
+                    </div>
+                </a>
+                <ul class="nav-menu">
+                    <li><a href="#calculator">Calculadora</a></li>
+                    <li><a href="#equipamiento">Equipamiento</a></li>
+                    <li><a href="#beneficios">Beneficios</a></li>
+                    <li><a href="#incentivos">Incentivos</a></li>
+                    <li><a href="{{ url_for('guide_page', slug='como-calcular-paneles-solares') }}">Guías</a></li>
+                </ul>
+                <button class="nav-toggle" id="navToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h4>Sun Depot</h4>
+                    <p>Tu guía completa para la transición a energía solar y movilidad eléctrica en México.</p>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook">📘</a>
+                        <a href="#" aria-label="Twitter">🐦</a>
+                        <a href="#" aria-label="Instagram">📷</a>
+                        <a href="#" aria-label="YouTube">📺</a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h4>Recursos</h4>
+                    <ul>
+                        <li><a href="{{ url_for('guide_page', slug='como-calcular-paneles-solares') }}">Cómo calcular paneles</a></li>
+                        <li><a href="{{ url_for('guide_page', slug='beneficios-vehiculo-electrico') }}">Beneficios PHEV</a></li>
+                        <li><a href="{{ url_for('comparison_tool', category='paneles') }}">Comparador de paneles</a></li>
+                        <li><a href="{{ url_for('comparison_tool', category='vehiculos') }}">Comparador de vehículos</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Herramientas</h4>
+                    <ul>
+                        <li><a href="#calculator">Calculadora Solar</a></li>
+                        <li><a href="/api/docs">API para Desarrolladores</a></li>
+                        <li><a href="#newsletter">Newsletter</a></li>
+                        <li><a href="/blog">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="/privacidad">Política de Privacidad</a></li>
+                        <li><a href="/terminos">Términos de Uso</a></li>
+                        <li><a href="/afiliados">Programa de Afiliados</a></li>
+                        <li><a href="/contacto">Contacto</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Sun Depot. Todos los derechos reservados.</p>
+                <p class="disclaimer">Este sitio contiene enlaces de afiliados. Podemos recibir una comisión por compras realizadas a través de estos enlaces.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+    
+    <!-- Schema.org Markup -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Sun Depot",
+        "url": "{{ request.url_root }}",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "{{ request.url_root }}buscar?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
+    }
+    </script>
+</body>
+</html>
