@@ -290,8 +290,10 @@ def seed_partners():
     partner_manager.seed_initial_partners()
     print("Partners cargados exitosamente")
 
+with app.app_context():
+    db.create_all()
+    print("✅ Base de datos inicializada")
+
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
     app.run(debug=True, host='0.0.0.0', port=5000)
 

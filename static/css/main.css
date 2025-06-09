@@ -128,18 +128,13 @@ body {
     text-align: center;
     color: var(--color-white);
     position: relative;
+    /* IMPORTANTE: overflow hidden para que funcionen los bordes redondeados */
     overflow: hidden;
-    /* Agregar padding inferior para el efecto de curva */
-    clip-path: polygon(0 0, 100% 0, 100% 90%, 50% 300%, 0 90%);
-    margin-bottom: -50px;
-}
-
-.hero-section-svg {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: auto;
+    /* Bordes redondeados más pronunciados */
+    border-bottom-left-radius: 100px;
+    border-bottom-right-radius: 100px;
+    border-radius: 0 0 1% 1% / 0 0 2% 2%;
+    box-shadow: 0 20px 30px rgba(0,0,0,0.1);
 }
 
 .hero-section::before {
@@ -152,6 +147,9 @@ body {
     background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="30" r="1.5" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
     animation: float 5s infinite linear;
     z-index: 0;
+    /* IMPORTANTE: heredar los bordes redondeados */
+    border-bottom-left-radius: 5rem;
+    border-bottom-right-radius: 5rem;
 }
 
 @keyframes float {
@@ -215,6 +213,7 @@ body {
     max-width: 600px;
     margin-left: auto;
     margin-right: auto;
+    padding-bottom: 2rem; /* O agrega padding */
 }
 
 .stat-card {
@@ -245,7 +244,7 @@ body {
     padding: 4rem 0;
     position: relative;
     z-index: 10;
-    margin-top: -30px;
+    margin-top: 10px;
 }
 
 .section-title {
