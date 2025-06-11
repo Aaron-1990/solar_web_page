@@ -65,6 +65,7 @@ def index():
                          vehicles=vehicles)
 
 @app.route('/api/calculate', methods=['POST'])
+
 def calculate_solar():
     """API endpoint para cálculos solares"""
     try:
@@ -77,6 +78,8 @@ def calculate_solar():
         vehicle_model = data.get('vehicleModel', '')
         daily_ev_km = float(data.get('dailyEvKm', 0))
         custom_battery = data.get('batteryCapacity')
+        vehicle_efficiency = data.get('vehicleEfficiency')
+        custom_vehicle_name = data.get('customVehicleName')
         
         # Realizar cálculo
         result = calculator.calculate_integral(
@@ -85,7 +88,9 @@ def calculate_solar():
             coverage=coverage,
             vehicle_model=vehicle_model,
             daily_ev_km=daily_ev_km,
-            custom_battery=custom_battery
+            custom_battery=custom_battery,
+            vehicle_efficiency=vehicle_efficiency,  # Nuevo
+            custom_vehicle_name=custom_vehicle_name  # Nuevo
         )
         
         # Guardar cálculo en base de datos

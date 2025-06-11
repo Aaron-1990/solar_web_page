@@ -125,12 +125,14 @@ class SolarCalculator:
         return vehicles_list
     
     def calculate_integral(self,
-                         home_consumption: float,
-                         location: str,
-                         coverage: float = 1.0,
-                         vehicle_model: str = "",
-                         daily_ev_km: float = 0,
-                         custom_battery: Optional[float] = None) -> Dict:
+                    home_consumption: float,
+                    location: str,
+                    coverage: float = 1.0,
+                    vehicle_model: str = "",
+                    daily_ev_km: float = 0,
+                    custom_battery: Optional[float] = None,
+                    vehicle_efficiency: Optional[float] = None,  # Nuevo
+                    custom_vehicle_name: Optional[str] = None) -> Dict:  # Nuevo
         """
         Realizar cálculo integral del sistema solar
         
@@ -141,6 +143,8 @@ class SolarCalculator:
             vehicle_model: Modelo de vehículo eléctrico/híbrido
             daily_ev_km: Kilómetros diarios en modo eléctrico
             custom_battery: Capacidad de batería personalizada (si aplica)
+            vehicle_efficiency: Eficiencia del vehículo en kWh/100km (para modo avanzado)
+            custom_vehicle_name: Nombre personalizado del vehículo
             
         Returns:
             Dict con todos los resultados del cálculo
@@ -159,19 +163,25 @@ class SolarCalculator:
         daily_home_consumption = annual_home_consumption / 365
         solar_energy_needed_home = daily_home_consumption * coverage
         
-        # Calcular consumo del vehículo
+        # Inicializar variables del vehículo
         solar_energy_needed_vehicle = 0
         vehicle_info = ""
         annual_gas_liters_saved = 0
+        efficiency = 0  # Inicializar para evitar errores
         
         if vehicle_model and vehicle_model != "":
             if vehicle_model == "custom":
-                # Vehículo personalizado
-                if not custom_battery:
-                    raise ValueError("Capacidad de batería requerida para vehículo personalizado")
-                battery_capacity = custom_battery
-                efficiency = 20  # Asumir 20 kWh/100km para vehículo genérico
-                vehicle_info = f"Vehículo personalizado ({battery_capacity} kWh)"
+                # Vehículo personalizado - usar eficiencia proporcionada o calcular
+                if vehicle_efficiency:
+                    efficiency = vehicle_efficiency
+                elif custom_battery:
+                    # Si solo tenemos batería, asumir eficiencia default
+                    efficiency = 20  # 20 kWh/100km es un promedio razonable
+                else:
+                    raise ValueError("Datos insuficientes para vehículo personalizado. Proporcione eficiencia o capacidad de batería.")
+                
+                vehicle_info = custom_vehicle_name or "Vehículo personalizado"
+                
             else:
                 # Vehículo predefinido
                 if vehicle_model not in self.vehicles:
@@ -182,13 +192,20 @@ class SolarCalculator:
                 efficiency = vehicle_data["efficiency"]
                 vehicle_info = vehicle_data["name"]
             
-            # Calcular energía diaria necesaria para el vehículo
-            daily_energy_consumption_vehicle = (daily_ev_km * efficiency) / 100
-            solar_energy_needed_vehicle = daily_energy_consumption_vehicle
-            
-            # Calcular gasolina ahorrada
-            vehicle_efficiency_km_per_liter = 15  # Asumir 15 km/L promedio
-            annual_gas_liters_saved = (daily_ev_km * 365) / vehicle_efficiency_km_per_liter
+            # Calcular consumo del vehículo (común para ambos casos)
+            if daily_ev_km > 0:
+                daily_energy_consumption_vehicle = (daily_ev_km * efficiency) / 100
+                solar_energy_needed_vehicle = daily_energy_consumption_vehicle
+                
+                # Calcular gasolina ahorrada
+                vehicle_efficiency_km_per_liter = 15  # Asumir 15 km/L promedio
+                annual_gas_liters_saved = (daily_ev_km * 365) / vehicle_efficiency_km_per_liter
+            else:
+                # Si no hay km diarios, no hay consumo
+                solar_energy_needed_vehicle = 0
+                annual_gas_liters_saved = 0
+        
+        # Si no hay vehículo, todas las variables ya están en 0
         
         # Calcular sistema solar total necesario
         total_daily_energy_needed = solar_energy_needed_home + solar_energy_needed_vehicle
@@ -201,13 +218,20 @@ class SolarCalculator:
         if (system_power_kw * 1000) % self.PANEL_POWER_W > 0:
             number_of_panels += 1
         
+        # Asegurar mínimo 1 panel si hay consumo
+        if total_daily_energy_needed > 0 and number_of_panels == 0:
+            number_of_panels = 1
+        
+        # Recalcular potencia real del sistema basada en paneles
+        actual_system_power_kw = (number_of_panels * self.PANEL_POWER_W) / 1000
+        
         # Calcular costos
-        total_system_cost = system_power_kw * self.COST_PER_KW_INSTALLED
+        total_system_cost = actual_system_power_kw * self.COST_PER_KW_INSTALLED
         sener_incentive = total_system_cost * self.SENER_INCENTIVE_RATE
         net_cost = total_system_cost - sener_incentive
         
         # Calcular generación anual del sistema
-        annual_solar_generation = system_power_kw * hsp * 365 * (1 - self.SYSTEM_LOSSES)
+        annual_solar_generation = actual_system_power_kw * hsp * 365 * (1 - self.SYSTEM_LOSSES)
         
         # Calcular ahorros
         annual_electricity_savings = min(annual_solar_generation, annual_home_consumption) * self.CFE_RATE_PER_KWH
@@ -227,11 +251,11 @@ class SolarCalculator:
         
         # Calcular ROI a 25 años
         total_savings_25_years = total_annual_savings * 25
-        roi_25_years = ((total_savings_25_years - net_cost) / net_cost) * 100
+        roi_25_years = ((total_savings_25_years - net_cost) / net_cost) * 100 if net_cost > 0 else 0
         
         return {
             # Sistema
-            "systemPowerKw": round(system_power_kw, 2),
+            "systemPowerKw": round(actual_system_power_kw, 2),
             "numberOfPanels": number_of_panels,
             "totalRoofArea": round(total_roof_area, 1),
             

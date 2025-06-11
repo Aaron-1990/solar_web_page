@@ -37,61 +37,172 @@
     <!-- CALCULADORA -->
     <section class="calculator-main" id="calculator">
         <div class="container">
-            <h2 class="section-title">🧮 Calculadora de Ahorro Solar Integral</h2>
-            <p class="section-subtitle">Calcula tu sistema solar para el hogar y vehículo eléctrico</p>
+            <h2 class="section-title">🧮 Calculadora de Ahorro Solar</h2>
+            <p class="section-subtitle">Calcula tu sistema solar personalizado</p>
             
-            <div class="form-grid">
-                <div>
-                    <h3 style="color: #2ECC71; margin-bottom: 1rem;">🏠 Datos del Hogar</h3>
-                    <div class="form-group">
-                        <label for="homeConsumption">Consumo eléctrico bimestral (kWh)</label>
-                        <input type="number" id="homeConsumption" placeholder="Ej: 400" value="400">
-                    </div>
-                    <div class="form-group">
-                        <label for="location">Ubicación (Estado)</label>
-                        <select id="location">
-                            <option value="">Selecciona tu estado</option>
-                            {% for loc in locations %}
-                            <option value="{{ loc.value }}" data-hsp="{{ loc.hsp }}">{{ loc.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="coverage">Porcentaje de cobertura deseado</label>
-                        <select id="coverage">
-                            <option value="50">50% - Básico</option>
-                            <option value="75">75% - Recomendado</option>
-                            <option value="100" selected>100% - Óptimo</option>
-                        </select>
-                    </div>
+            <!-- PASO 1: DATOS DEL HOGAR (SIEMPRE VISIBLE) -->
+            <div class="calculator-card">
+                <div class="card-header">
+                    <h3>🏠 Paso 1: Datos de tu Hogar</h3>
+                    <span class="required-badge">Requerido</span>
                 </div>
-                <div>
-                    <h3 style="color: #2ECC71; margin-bottom: 1rem;">🚗 Datos del Vehículo (Opcional)</h3>
-                    <div class="form-group">
-                        <label for="vehicleModel">¿Tienes vehículo eléctrico/híbrido?</label>
-                        <select id="vehicleModel">
-                            <option value="">No tengo / No incluir</option>
-                            {% for vehicle in vehicles %}
-                            <option value="{{ vehicle.value }}">{{ vehicle.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="form-group" id="customSpecs" style="display: none;">
-                        <label for="batteryCapacity">Capacidad de Batería (kWh)</label>
-                        <input type="number" id="batteryCapacity" step="0.1" placeholder="Ej: 15.5">
-                    </div>
-                    <div class="form-group" id="dailyKmGroup" style="display: none;">
-                        <label for="dailyEvKm">Kilómetros diarios en modo eléctrico</label>
-                        <input type="number" id="dailyEvKm" placeholder="Ej: 40" value="40">
-                    </div>
-                    <div class="warning-box">
-                        <strong>💡 Tip:</strong> Incluir tu vehículo eléctrico te dará un cálculo más preciso del sistema integral.
+                <div class="card-content">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="homeConsumption">
+                                Consumo eléctrico bimestral (kWh)
+                                <span class="field-help">Revisa tu recibo de CFE</span>
+                            </label>
+                            <input type="number" id="homeConsumption" placeholder="Ej: 400" value="400">
+                        </div>
+                        <div class="form-group">
+                            <label for="location">
+                                Ubicación (Estado)
+                                <span class="field-help">Para calcular las horas de sol</span>
+                            </label>
+                            <select id="location">
+                                <option value="">Selecciona tu estado</option>
+                                {% for loc in locations %}
+                                <option value="{{ loc.value }}" data-hsp="{{ loc.hsp }}">{{ loc.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="coverage">
+                                Porcentaje de cobertura deseado
+                                <span class="field-help">¿Cuánto quieres reducir tu factura?</span>
+                            </label>
+                            <select id="coverage">
+                                <option value="50">50% - Ahorro moderado</option>
+                                <option value="75">75% - Buen ahorro</option>
+                                <option value="100" selected>100% - Máximo ahorro</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
-            <button class="calculate-btn" onclick="calculateIntegral()">⚡ Calcular Mi Sistema Solar Integral</button>
+
+            <!-- PASO 2: VEHÍCULO ELÉCTRICO (OPCIONAL) -->
+            <div class="calculator-card optional">
+                <div class="card-header toggle-header" onclick="toggleVehicleSection()">
+                    <div class="header-left">
+                        <h3>🚗 Paso 2: ¿Tienes vehículo eléctrico o híbrido?</h3>
+                        <span class="optional-badge">Opcional</span>
+                    </div>
+                    <div class="toggle-container">
+                        <span class="toggle-text" id="vehicleToggleText">No incluir</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="includeVehicle" onchange="toggleVehicleSection()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="card-content" id="vehicleContent" style="display: none;">
+                    <!-- Selector de modo -->
+                    <div class="mode-tabs">
+                        <button class="mode-tab active" onclick="selectVehicleMode('simple')">
+                            <span class="tab-icon">🚘</span>
+                            <span class="tab-text">Modo Simple</span>
+                        </button>
+                        <button class="mode-tab" onclick="selectVehicleMode('advanced')">
+                            <span class="tab-icon">⚡</span>
+                            <span class="tab-text">Modo Avanzado</span>
+                        </button>
+                    </div>
+
+                    <!-- MODO SIMPLE -->
+                    <div id="simpleVehicleMode" class="vehicle-mode-panel">
+                        <div class="form-group">
+                            <label for="vehicleModel">Selecciona tu vehículo</label>
+                            <select id="vehicleModel" onchange="handleVehicleSelection()">
+                                <option value="">Elige un modelo</option>
+                                {% for vehicle in vehicles %}
+                                <option value="{{ vehicle.value }}">{{ vehicle.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- MODO AVANZADO -->
+                    <div id="advancedVehicleMode" class="vehicle-mode-panel" style="display: none;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="consumptionInput">
+                                    Consumo eléctrico
+                                    <span class="field-help">kWh por cada 100 km</span>
+                                </label>
+                                <div class="input-with-unit">
+                                    <input type="number" id="consumptionInput" step="0.1" placeholder="15.5">
+                                    <span class="unit">kWh/100km</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="customVehicleName">
+                                    Nombre del vehículo
+                                    <span class="field-help">Opcional</span>
+                                </label>
+                                <input type="text" id="customVehicleName" placeholder="Mi auto eléctrico">
+                            </div>
+                        </div>
+                        
+                        <!-- Calculadora de eficiencia -->
+                        <div class="efficiency-calculator">
+                            <p class="helper-text">¿No conoces el consumo? Calcula aquí:</p>
+                            <div class="form-row">
+                                <div class="form-group small">
+                                    <label for="batteryHelper">Batería (kWh)</label>
+                                    <input type="number" id="batteryHelper" step="0.1" placeholder="40">
+                                </div>
+                                <div class="form-group small">
+                                    <label for="rangeHelper">Autonomía (km)</label>
+                                    <input type="number" id="rangeHelper" placeholder="300">
+                                </div>
+                                <button type="button" class="calc-helper-btn" onclick="calculateEfficiency()">
+                                    Calcular
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kilómetros diarios (visible para ambos modos) -->
+                    <div class="form-group" id="dailyKmSection" style="display: none;">
+                        <label for="dailyEvKm">
+                            ¿Cuántos kilómetros recorres al día?
+                            <span class="field-help">En modo eléctrico</span>
+                        </label>
+                        <div class="km-slider-container">
+                            <input type="range" id="kmSlider" min="0" max="200" value="40" oninput="updateKmValue()">
+                            <div class="km-display">
+                                <input type="number" id="dailyEvKm" value="40" min="0" max="500" onchange="updateKmSlider()">
+                                <span class="unit">km/día</span>
+                            </div>
+                        </div>
+                        <div class="km-presets">
+                            <button type="button" class="preset-btn" onclick="setKm(20)">20 km</button>
+                            <button type="button" class="preset-btn" onclick="setKm(40)">40 km</button>
+                            <button type="button" class="preset-btn" onclick="setKm(60)">60 km</button>
+                            <button type="button" class="preset-btn" onclick="setKm(100)">100 km</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOTÓN DE CALCULAR -->
+            <div class="calculate-section">
+                <button class="calculate-btn" onclick="calculateIntegral()">
+                    <span class="btn-icon">⚡</span>
+                    <span class="btn-text">Calcular Mi Sistema Solar</span>
+                </button>
+                <p class="calculate-hint">
+                    <span id="calculationMode">Calculando solo para tu hogar</span>
+                </p>
+            </div>
+
+            <!-- RESULTADOS -->
             <div class="results-section" id="results">
                 <h3 class="section-title">📊 Resultados de tu Sistema Solar</h3>
+                <div class="results-summary" id="resultsSummary"></div>
                 <div class="results-grid" id="resultsGrid"></div>
             </div>
         </div>
