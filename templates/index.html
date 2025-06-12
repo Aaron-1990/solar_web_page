@@ -40,13 +40,18 @@
             <h2 class="section-title">🧮 Calculadora de Ahorro Solar</h2>
             <p class="section-subtitle">Calcula tu sistema solar personalizado</p>
             
-            <!-- PASO 1: DATOS DEL HOGAR (SIEMPRE VISIBLE) -->
+            <!-- ========================================
+            SECCIÓN DE SELECCIÓN DE PANELES SOLARES
+            Reemplazar la sección "PASO 1: DATOS DEL HOGAR" existente
+            ======================================== -->
+
             <div class="calculator-card">
                 <div class="card-header">
                     <h3>🏠 Paso 1: Datos de tu Hogar</h3>
                     <span class="required-badge">Requerido</span>
                 </div>
                 <div class="card-content">
+                    <!-- Datos básicos del hogar -->
                     <div class="form-row">
                         <div class="form-group">
                             <label for="homeConsumption">
@@ -77,6 +82,67 @@
                                 <option value="75">75% - Buen ahorro</option>
                                 <option value="100" selected>100% - Máximo ahorro</option>
                             </select>
+                        </div>
+                    </div>
+                    
+                    <!-- NUEVA SECCIÓN: CONFIGURACIÓN DE PANELES SOLARES -->
+                    <div class="panel-selection-section">
+                        <h4 class="subsection-title">⚡ Configuración de Paneles Solares</h4>
+                        
+                        <div class="form-group">
+                            <label for="panelType">
+                                Tipo de panel solar
+                                <span class="field-help">Selecciona la potencia que prefieras - afecta la cantidad de paneles necesarios</span>
+                            </label>
+                            <select id="panelType">
+                                <option value="450w">Panel 450W (Estándar)</option>
+                                <option value="500w" selected>Panel 500W (Alta Eficiencia)</option>
+                                <option value="550w">Panel 550W (Premium)</option>
+                                <option value="600w">Panel 600W (Ultra Premium)</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Tarjeta de información del panel seleccionado -->
+                        <div class="panel-info-card" id="panelInfoCard">
+                            <div class="panel-specs">
+                                <div class="spec-item">
+                                    <span class="spec-label">Potencia:</span>
+                                    <span class="spec-value" id="panelPower">500W</span>
+                                </div>
+                                <div class="spec-item">
+                                    <span class="spec-label">Eficiencia:</span>
+                                    <span class="spec-value" id="panelEfficiency">21.8%</span>
+                                </div>
+                                <div class="spec-item">
+                                    <span class="spec-label">Área:</span>
+                                    <span class="spec-value" id="panelArea">2.4 m²</span>
+                                </div>
+                                <div class="spec-item">
+                                    <span class="spec-label">Tecnología:</span>
+                                    <span class="spec-value" id="panelTech">Half-Cell</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Descripción del panel -->
+                            <div class="panel-description" id="panelDescription">
+                                Panel solar de alta eficiencia, mejor relación costo-beneficio
+                            </div>
+                            
+                            <!-- Hint de comparación -->
+                            <div class="panel-comparison-hint">
+                                <div class="comparison-metric">
+                                    <span class="metric-label">Generación estimada</span>
+                                    <span class="metric-value" id="panelDailyGen">2.5 kWh/día</span>
+                                </div>
+                                <div class="comparison-metric">
+                                    <span class="metric-label">Densidad de potencia</span>
+                                    <span class="metric-value" id="panelPowerDensity">208 W/m²</span>
+                                </div>
+                                <div class="comparison-metric">
+                                    <span class="metric-label">Garantía</span>
+                                    <span class="metric-value" id="panelWarranty">25 años</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -204,6 +270,89 @@
                 <h3 class="section-title">📊 Resultados de tu Sistema Solar</h3>
                 <div class="results-summary" id="resultsSummary"></div>
                 <div class="results-grid" id="resultsGrid"></div>
+            </div>
+            <!-- NUEVO: AGREGAR ESTA SECCIÓN COMPLETA -->
+            <div class="cost-disclaimer-section" id="costDisclaimer" style="display: none;">
+                <div class="disclaimer-card">
+                    <div class="disclaimer-header">
+                        <h4>💡 Información Importante sobre Costos</h4>
+                    </div>
+                    <div class="disclaimer-content">
+                        <div class="disclaimer-grid">
+                            <div class="disclaimer-item">
+                                <div class="disclaimer-icon">📊</div>
+                                <div class="disclaimer-text">
+                                    <h5>Precios de Referencia</h5>
+                                    <p>Los costos mostrados son <strong>estimaciones generales</strong> basadas en promedios del mercado mexicano.</p>
+                                </div>
+                            </div>
+                            <div class="disclaimer-item">
+                                <div class="disclaimer-icon">📋</div>
+                                <div class="disclaimer-text">
+                                    <h5>Cotización Personalizada</h5>
+                                    <p>Cada proyecto requiere una <strong>cotización específica</strong> que considera tu ubicación, instalación y equipos particulares.</p>
+                                </div>
+                            </div>
+                            <div class="disclaimer-item">
+                                <div class="disclaimer-icon">🏠</div>
+                                <div class="disclaimer-text">
+                                    <h5>Factores Variables</h5>
+                                    <p>El costo final depende de: tipo de techo, distancia eléctrica, permisos locales, y configuración específica.</p>
+                                </div>
+                            </div>
+                            <div class="disclaimer-item">
+                                <div class="disclaimer-icon">📈</div>
+                                <div class="disclaimer-text">
+                                    <h5>Precios Actualizados</h5>
+                                    <p>Los precios de equipos varían constantemente por fluctuaciones del mercado internacional y tipo de cambio.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="action-section">
+                            <h5>🎯 Recomendación</h5>
+                            <p>Usa estos números como <strong>referencia inicial</strong>. Para una cotización precisa, contacta directamente con instaladores certificados de tu zona.</p>
+                            <button class="quote-cta-btn" onclick="showQuoteOptions()">
+                                <span class="btn-icon">📞</span>
+                                <span class="btn-text">Obtener Cotización Precisa</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL PARA OPCIONES DE COTIZACIÓN -->
+            <div class="quote-modal" id="quoteModal" style="display: none;">
+                <div class="modal-overlay" onclick="closeQuoteModal()"></div>
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4>🔍 Obtén tu Cotización Personalizada</h4>
+                        <button class="modal-close" onclick="closeQuoteModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Te conectamos con instaladores certificados de tu zona para obtener precios reales y actualizados:</p>
+                        
+                        <div class="quote-options">
+                            <div class="quote-option">
+                                <h5>📧 Solicitar por Email</h5>
+                                <p>Enviamos tu cálculo a instaladores locales</p>
+                                <button class="option-btn" onclick="requestEmailQuote()">Enviar Solicitud</button>
+                            </div>
+                            
+                            <div class="quote-option">
+                                <h5>📞 Llamada Directa</h5>
+                                <p>Programa una consulta telefónica gratuita</p>
+                                <button class="option-btn" onclick="scheduleCall()">Programar Llamada</button>
+                            </div>
+                            
+                            <div class="quote-option">
+                                <h5>🏪 Instaladores Recomendados</h5>
+                                <p>Contacta directamente con nuestros partners</p>
+                                <button class="option-btn" onclick="showInstallers()">Ver Instaladores</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>

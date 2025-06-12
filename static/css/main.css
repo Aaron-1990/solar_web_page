@@ -1102,3 +1102,245 @@ input:checked + .toggle-slider:before {
         width: 40px;
     }
 }
+
+/* ========================================
+   DISCLAIMER DE COSTOS
+   ======================================== */
+.cost-disclaimer-section {
+    margin: 2rem 0;
+    padding: 0 1rem;
+}
+
+.disclaimer-card {
+    background: linear-gradient(135deg, #fff8e1, #ffffff);
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(255, 193, 7, 0.1);
+    border-left: 4px solid #FF9900;
+    overflow: hidden;
+    animation: slideInUp 0.5s ease-out;
+}
+
+.disclaimer-header {
+    background: linear-gradient(135deg, #FF9900, #F5A623);
+    color: white;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.disclaimer-header h4 {
+    margin: 0;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.disclaimer-content {
+    padding: 2rem;
+}
+
+.disclaimer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.disclaimer-item {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    transition: transform 0.3s ease;
+}
+
+.disclaimer-item:hover {
+    transform: translateY(-2px);
+}
+
+.disclaimer-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+}
+
+.disclaimer-text h5 {
+    color: #FF9900;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.disclaimer-text p {
+    color: #666;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.action-section {
+    background: rgba(255, 153, 0, 0.05);
+    border-radius: 10px;
+    padding: 1.5rem;
+    text-align: center;
+    border: 1px solid rgba(255, 153, 0, 0.2);
+}
+
+.action-section h5 {
+    color: #FF9900;
+    margin-bottom: 1rem;
+}
+
+.quote-cta-btn {
+    background: linear-gradient(135deg, #FF9900, #F5A623);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.quote-cta-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 153, 0, 0.3);
+}
+
+/* Modal Styles */
+.quote-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background: white;
+    border-radius: 15px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80%;
+    overflow-y: auto;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #2ECC71, #27AE60);
+    color: white;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.3s;
+}
+
+.modal-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.modal-body {
+    padding: 2rem;
+}
+
+.quote-options {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.quote-option {
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.quote-option:hover {
+    border-color: #2ECC71;
+    transform: translateY(-2px);
+}
+
+.quote-option h5 {
+    color: #2ECC71;
+    margin-bottom: 0.5rem;
+}
+
+.option-btn {
+    background: #2ECC71;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+}
+
+.option-btn:hover {
+    background: #27AE60;
+    transform: scale(1.05);
+}
+
+/* Animaciones */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .disclaimer-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .disclaimer-item {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 1rem;
+    }
+}

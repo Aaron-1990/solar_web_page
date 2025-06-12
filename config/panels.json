@@ -1,0 +1,46 @@
+{
+  "450w": {
+    "name": "Panel 450W (Estándar)",
+    "power": 450,
+    "area_m2": 2.3,
+    "efficiency": 20.5,
+    "description": "Panel solar monocristalino estándar, ideal para comenzar en energía solar",
+    "warranty_years": 25,
+    "degradation_rate": 0.005,
+    "recommended_for": ["residencial", "pequeño_comercial"],
+    "technology": "Monocristalino PERC"
+  },
+  "500w": {
+    "name": "Panel 500W (Alta Eficiencia)",
+    "power": 500,
+    "area_m2": 2.4,
+    "efficiency": 21.8,
+    "description": "Panel solar de alta eficiencia, mejor relación costo-beneficio",
+    "warranty_years": 25,
+    "degradation_rate": 0.004,
+    "recommended_for": ["residencial", "comercial"],
+    "technology": "Monocristalino Half-Cell"
+  },
+  "550w": {
+    "name": "Panel 550W (Premium)",
+    "power": 550,
+    "area_m2": 2.5,
+    "efficiency": 22.5,
+    "description": "Panel solar premium para máxima generación en espacios limitados",
+    "warranty_years": 30,
+    "degradation_rate": 0.003,
+    "recommended_for": ["residencial_premium", "comercial", "industrial"],
+    "technology": "Monocristalino Bifacial"
+  },
+  "600w": {
+    "name": "Panel 600W (Ultra Premium)",
+    "power": 600,
+    "area_m2": 2.6,
+    "efficiency": 23.2,
+    "description": "Panel solar ultra premium de última generación, máxima eficiencia",
+    "warranty_years": 30,
+    "degradation_rate": 0.003,
+    "recommended_for": ["comercial", "industrial", "proyectos_especiales"],
+    "technology": "Monocristalino TOPCon"
+  }
+}

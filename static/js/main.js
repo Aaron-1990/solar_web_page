@@ -35,7 +35,7 @@ function initCalculator() {
 }
 
 async function calculateIntegral() {
-        // Verificar si estamos usando el nuevo diseño
+    // Verificar si estamos usando el nuevo diseño
     const newDesign = document.getElementById('includeVehicle');
     
     if (newDesign) {
@@ -48,7 +48,8 @@ async function calculateIntegral() {
         location: document.getElementById('location').value,
         coverage: parseFloat(document.getElementById('coverage').value),
         vehicleModel: document.getElementById('vehicleModel').value,
-        dailyEvKm: parseFloat(document.getElementById('dailyEvKm').value) || 0
+        dailyEvKm: parseFloat(document.getElementById('dailyEvKm').value) || 0,
+        panelType: document.getElementById('panelType')?.value || '500w' // NUEVO
     };
     
     // Validaciones
@@ -91,7 +92,11 @@ async function calculateIntegral() {
             if (typeof gtag !== 'undefined') {
                 gtag('event', 'calculation_completed', {
                     'event_category': 'engagement',
-                    'event_label': formData.vehicleModel || 'no_vehicle'
+                    'event_label': formData.vehicleModel || 'no_vehicle',
+                    'custom_parameters': {
+                        'panel_type': formData.panelType,
+                        'panel_power': result.data.panelPowerW
+                    }
                 });
             }
             
@@ -99,7 +104,8 @@ async function calculateIntegral() {
             if (typeof fbq !== 'undefined') {
                 fbq('track', 'CompleteRegistration', {
                     value: result.data.netCost,
-                    currency: 'MXN'
+                    currency: 'MXN',
+                    content_name: result.data.panelType
                 });
             }
         } else {
@@ -115,71 +121,74 @@ async function calculateIntegral() {
     }
 }
 
-// Nueva función para manejar la calculadora mejorada
+// Nueva función para manejar la calculadora mejorada con paneles modulares
 async function calculateIntegralNew() {
-    // Preparar datos del formulario
-    const formData = {
-        homeConsumption: parseFloat(document.getElementById('homeConsumption').value) || 400,
-        location: document.getElementById('location').value,
-        coverage: parseFloat(document.getElementById('coverage').value)
-    };
-    
-    // Validaciones básicas
-    if (!formData.location) {
-        showError('Por favor selecciona tu ubicación');
-        return;
-    }
-    
-    // Verificar si se incluye vehículo
-    const includeVehicle = document.getElementById('includeVehicle').checked;
-    
-    if (includeVehicle) {
-        // Determinar el modo activo (simple o avanzado)
-        const activeTab = document.querySelector('.mode-tab.active');
-        const isSimpleMode = activeTab && activeTab.textContent.includes('Simple');
+    try {
+        // Obtener configuración de paneles del módulo si está disponible
+        const panelConfig = window.PanelModule ? window.PanelModule.getCalculationConfig() : null;
         
-        if (isSimpleMode) {
-            // MODO SIMPLE
-            const vehicleModelSelect = document.getElementById('vehicleModel');
-            formData.vehicleModel = vehicleModelSelect.value;
-            
-            if (!formData.vehicleModel) {
-                showError('Por favor selecciona un vehículo');
-                return;
-            }
-        } else {
-            // MODO AVANZADO
-            formData.vehicleModel = 'custom';
-            
-            // Obtener datos del modo avanzado
-            const vehicleEfficiency = parseFloat(document.getElementById('consumptionInput').value);
-            const customVehicleName = document.getElementById('customVehicleName').value;
-            
-            if (!vehicleEfficiency) {
-                showError('Por favor ingresa el consumo del vehículo');
-                return;
-            }
-            
-            // Para el backend, enviar la eficiencia como si fuera la eficiencia del vehículo
-            formData.vehicleEfficiency = vehicleEfficiency;
-            formData.customVehicleName = customVehicleName || 'Vehículo personalizado';
+        // Preparar datos del formulario
+        const formData = {
+            homeConsumption: parseFloat(document.getElementById('homeConsumption').value) || 400,
+            location: document.getElementById('location').value,
+            coverage: parseFloat(document.getElementById('coverage').value),
+            panelType: panelConfig ? panelConfig.panelType : (document.getElementById('panelType')?.value || '500w')
+        };
+        
+        // Validaciones básicas
+        if (!formData.location) {
+            showError('Por favor selecciona tu ubicación');
+            return;
         }
         
-        // Kilómetros diarios (común para ambos modos)
-        formData.dailyEvKm = parseFloat(document.getElementById('dailyEvKm').value) || 40;
-    } else {
-        // No incluir vehículo
-        formData.vehicleModel = '';
-        formData.dailyEvKm = 0;
-    }
-    
-    // Mostrar loading
-    const calculateBtn = document.querySelector('.calculate-btn');
-    const originalContent = calculateBtn.innerHTML;
-    calculateBtn.innerHTML = '<span class="loading"></span> Calculando...';
-    calculateBtn.disabled = true;
-    
-    try {
+        // Verificar si se incluye vehículo
+        const includeVehicle = document.getElementById('includeVehicle')?.checked || false;
+        
+        if (includeVehicle) {
+            // Determinar el modo activo (simple o avanzado)
+            const activeTab = document.querySelector('.mode-tab.active');
+            const isSimpleMode = activeTab && activeTab.textContent.includes('Simple');
+            
+            if (isSimpleMode) {
+                // MODO SIMPLE
+                const vehicleModelSelect = document.getElementById('vehicleModel');
+                formData.vehicleModel = vehicleModelSelect?.value || '';
+                
+                if (!formData.vehicleModel) {
+                    showError('Por favor selecciona un vehículo');
+                    return;
+                }
+            } else {
+                // MODO AVANZADO
+                formData.vehicleModel = 'custom';
+                
+                // Obtener datos del modo avanzado
+                const vehicleEfficiency = parseFloat(document.getElementById('consumptionInput')?.value);
+                const customVehicleName = document.getElementById('customVehicleName')?.value;
+                
+                if (!vehicleEfficiency) {
+                    showError('Por favor ingresa el consumo del vehículo');
+                    return;
+                }
+                
+                formData.vehicleEfficiency = vehicleEfficiency;
+                formData.customVehicleName = customVehicleName || 'Vehículo personalizado';
+            }
+            
+            // Kilómetros diarios (común para ambos modos)
+            formData.dailyEvKm = parseFloat(document.getElementById('dailyEvKm')?.value) || 40;
+        } else {
+            // No incluir vehículo
+            formData.vehicleModel = '';
+            formData.dailyEvKm = 0;
+        }
+        
+        // Mostrar loading
+        const calculateBtn = document.querySelector('.calculate-btn');
+        const originalContent = calculateBtn.innerHTML;
+        calculateBtn.innerHTML = '<span class="loading"></span> Calculando...';
+        calculateBtn.disabled = true;
+        
         // Llamar a la API
         const response = await fetch(`${API_BASE_URL}/api/calculate`, {
             method: 'POST',
@@ -192,15 +201,28 @@ async function calculateIntegralNew() {
         const result = await response.json();
         
         if (result.success) {
-            // Usar la función mejorada de display
-            displayImprovedResults(result.data);
+            // Usar la función mejorada de display que incluye información de paneles
+            displayImprovedResultsWithPanels(result.data);
+            
+            // Disparar evento para el módulo de paneles
+            if (window.PanelModule) {
+                const event = new CustomEvent('calculationUpdated', {
+                    detail: result.data
+                });
+                document.dispatchEvent(event);
+            }
             
             // Analytics
             if (typeof gtag !== 'undefined') {
                 gtag('event', 'calculation_completed', {
                     'event_category': 'engagement',
                     'event_label': includeVehicle ? 'with_vehicle' : 'home_only',
-                    'event_value': result.data.numberOfPanels
+                    'event_value': result.data.numberOfPanels,
+                    'custom_parameters': {
+                        'panel_type': formData.panelType,
+                        'panel_power': result.data.panelPowerW,
+                        'system_power_kw': result.data.systemPowerKw
+                    }
                 });
             }
             
@@ -209,7 +231,8 @@ async function calculateIntegralNew() {
                 fbq('track', 'CompleteRegistration', {
                     value: result.data.netCost,
                     currency: 'MXN',
-                    content_type: includeVehicle ? 'home_plus_vehicle' : 'home_only'
+                    content_type: includeVehicle ? 'home_plus_vehicle' : 'home_only',
+                    content_name: result.data.panelType
                 });
             }
         } else {
@@ -220,12 +243,162 @@ async function calculateIntegralNew() {
         showError('Error al conectar con el servidor');
     } finally {
         // Restaurar botón
-        calculateBtn.innerHTML = originalContent;
-        calculateBtn.disabled = false;
+        const calculateBtn = document.querySelector('.calculate-btn');
+        if (calculateBtn) {
+            calculateBtn.innerHTML = calculateBtn.dataset.originalContent || 
+                '<span class="btn-icon">⚡</span><span class="btn-text">Calcular Mi Sistema Solar</span>';
+            calculateBtn.disabled = false;
+        }
     }
 }
 
-// Función mejorada para mostrar resultados con el nuevo diseño
+// Función mejorada para mostrar resultados con información modular de paneles
+function displayImprovedResultsWithPanels(results) {
+    const resultsSection = document.getElementById('results');
+    const resultsSummary = document.getElementById('resultsSummary');
+    const resultsGrid = document.getElementById('resultsGrid');
+    
+    if (!resultsSection || !resultsGrid) {
+        console.error('❌ Elementos de resultados no encontrados');
+        return;
+    }
+    
+    // Verificar si tenemos el elemento de resumen (nuevo diseño)
+    if (resultsSummary) {
+        // Resumen principal con información de paneles
+        const summaryText = results.hasVehicle 
+            ? `${results.numberOfPanels} paneles de ${results.panelPowerW}W • Ahorro anual de $${results.totalAnnualSavings.toLocaleString()}`
+            : `${results.numberOfPanels} paneles de ${results.panelPowerW}W para tu hogar • Ahorro anual de $${results.totalAnnualSavings.toLocaleString()}`;
+            
+        resultsSummary.innerHTML = `
+            <h4>¡Tu sistema solar ideal está listo!</h4>
+            <p class="main-result">${results.systemPowerKw} kW (${results.panelType})</p>
+            <p class="sub-result">${summaryText}</p>
+            <div class="panel-summary">
+                <span class="panel-detail">Cada panel genera ~${results.kwh_per_panel_bimestral} kWh bimestral</span>
+                <span class="panel-detail">Área total requerida: ${results.totalRoofArea} m²</span>
+            </div>
+        `;
+    }
+    
+    // Grid de resultados detallados con iconos
+    let vehicleResults = '';
+    if (results.hasVehicle) {
+        vehicleResults = `
+            <div class="result-card">
+                <div class="result-icon">⛽</div>
+                <div class="result-value">$${results.annualGasSavings.toLocaleString()}</div>
+                <div class="result-label">Ahorro Anual en Gasolina</div>
+            </div>
+            <div class="result-card">
+                <div class="result-icon">🚗</div>
+                <div class="result-value">${results.vehicleInfo}</div>
+                <div class="result-label">Vehículo Incluido</div>
+            </div>
+        `;
+    }
+    
+    resultsGrid.innerHTML = `
+        <div class="result-card highlight panel-info">
+            <div class="result-icon">⚡</div>
+            <div class="result-value">${results.numberOfPanels}</div>
+            <div class="result-label">Paneles ${results.panelPowerW}W</div>
+            <div class="result-sublabel">${results.panelType}</div>
+        </div>
+        <div class="result-card highlight">
+            <div class="result-icon">💰</div>
+            <div class="result-value">$${results.netCost.toLocaleString()}</div>
+            <div class="result-label">Inversión Total (con incentivos)</div>
+        </div>
+        <div class="result-card">
+            <div class="result-icon">🏠</div>
+            <div class="result-value">$${results.annualElectricitySavings.toLocaleString()}</div>
+            <div class="result-label">Ahorro Anual en Electricidad</div>
+        </div>
+        ${vehicleResults}
+        <div class="result-card">
+            <div class="result-icon">📅</div>
+            <div class="result-value">${results.paybackYears} años</div>
+            <div class="result-label">Recuperación de Inversión</div>
+        </div>
+        <div class="result-card">
+            <div class="result-icon">🌱</div>
+            <div class="result-value">${results.totalCo2Avoided} ton</div>
+            <div class="result-label">CO₂ Evitado Anualmente</div>
+        </div>
+        <div class="result-card">
+            <div class="result-icon">📐</div>
+            <div class="result-value">${results.totalRoofArea} m²</div>
+            <div class="result-label">Área de Techo Requerida</div>
+        </div>
+        <div class="result-card">
+            <div class="result-icon">💵</div>
+            <div class="result-value">$${results.monthlySavings.toLocaleString()}</div>
+            <div class="result-label">Ahorro Mensual Promedio</div>
+        </div>
+        <div class="result-card">
+            <div class="result-icon">📈</div>
+            <div class="result-value">${results.roi25Years}%</div>
+            <div class="result-label">ROI a 25 años</div>
+        </div>
+        <div class="result-card">
+            <div class="result-icon">🌳</div>
+            <div class="result-value">${Math.round(results.treesEquivalent)}</div>
+            <div class="result-label">Árboles Equivalentes</div>
+        </div>
+    `;
+    
+    // Mostrar información detallada del cálculo con datos del panel
+    const detailedCalc = document.createElement('div');
+    detailedCalc.className = 'calculation-breakdown';
+    detailedCalc.innerHTML = `
+        <h5>📊 Desglose del Cálculo</h5>
+        <div class="breakdown-grid">
+            <div class="breakdown-item">
+                <span class="breakdown-label">Panel seleccionado:</span>
+                <span class="breakdown-value">${results.panelType}</span>
+            </div>
+            <div class="breakdown-item">
+                <span class="breakdown-label">Generación por panel (bimestral):</span>
+                <span class="breakdown-value">${results.kwh_per_panel_bimestral} kWh</span>
+            </div>
+            <div class="breakdown-item">
+                <span class="breakdown-label">Generación total diaria:</span>
+                <span class="breakdown-value">${results.dailyGeneration} kWh</span>
+            </div>
+            <div class="breakdown-item">
+                <span class="breakdown-label">Generación anual:</span>
+                <span class="breakdown-value">${results.annualSolarGeneration.toLocaleString()} kWh</span>
+            </div>
+            <div class="breakdown-item">
+                <span class="breakdown-label">HSP de tu ubicación:</span>
+                <span class="breakdown-value">${results.hsp} horas</span>
+            </div>
+            <div class="breakdown-item">
+                <span class="breakdown-label">Cobertura seleccionada:</span>
+                <span class="breakdown-value">${results.coverage}%</span>
+            </div>
+        </div>
+    `;
+    
+    resultsGrid.appendChild(detailedCalc);
+    
+    // Mostrar sección de resultados con animación
+    resultsSection.style.display = 'block';
+    resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    
+    // Mostrar disclaimer de costos si existe la función
+    if (typeof showCostDisclaimer === 'function') {
+        showCostDisclaimer();
+    }
+    
+    // Animar los números si la función existe
+    if (typeof animateNumbers === 'function') {
+        animateNumbers();
+    }
+}
+
+// Función mejorada para mostrar resultados con el nuevo diseño (fallback)
 function displayImprovedResults(results) {
     const resultsSection = document.getElementById('results');
     const resultsSummary = document.getElementById('resultsSummary');
@@ -291,7 +464,7 @@ function displayImprovedResults(results) {
         </div>
         <div class="result-card">
             <div class="result-icon">💵</div>
-            <div class="result-value">$${results.monthlySavings.toLocaleString()}</div>
+            <div class="result-value">${results.monthlySavings.toLocaleString()}</div>
             <div class="result-label">Ahorro Mensual Promedio</div>
         </div>
         <div class="result-card">
@@ -439,8 +612,6 @@ function displayResults(results) {
             </div>
         `;
     }
-    
-
 
     resultsGrid.innerHTML = `
         <div class="result-card">
@@ -642,9 +813,44 @@ function createNotification(message, type) {
         right: 20px;
         z-index: 9999;
         animation: slideIn 0.3s ease-out;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        color: white;
+        font-weight: 500;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        ${type === 'error' ? 'background: #e74c3c;' : 'background: #2ECC71;'}
     `;
     return div;
 }
+
+// ========================================
+// FUNCIONES AUXILIARES PARA PANELES
+// ========================================
+
+// Función auxiliar para preview en tiempo real (opcional)
+function updateCalculationPreview(panelData) {
+    // Esta función puede mostrar un preview en tiempo real
+    // de cómo afecta el cambio de panel al cálculo
+    const homeConsumption = parseFloat(document.getElementById('homeConsumption')?.value) || 400;
+    const locationSelect = document.getElementById('location');
+    const hsp = locationSelect?.options[locationSelect.selectedIndex]?.dataset.hsp || 5.5;
+    
+    // Cálculo rápido para preview
+    const panelsNeeded = Math.ceil(homeConsumption / ((panelData.panelData.power * hsp * 60 * 0.8) / 1000));
+    
+    // Mostrar hint visual (opcional)
+    if (document.getElementById('panelPreview')) {
+        document.getElementById('panelPreview').textContent = 
+            `Estimación: ~${panelsNeeded} paneles necesarios`;
+    }
+}
+
+// Función global para compatibilidad con HTML onclick (para paneles)
+window.updatePanelInfo = function() {
+    if (window.PanelModule && window.PanelModule.state.isInitialized) {
+        window.PanelModule.updatePanelInfo();
+    }
+};
 
 // ========================================
 // SMOOTH SCROLL
@@ -682,7 +888,6 @@ if ('IntersectionObserver' in window) {
     });
 }
 
-
 // ========================================
 // SERVICE WORKER (PWA)
 // ========================================
@@ -695,9 +900,11 @@ if ('serviceWorker' in navigator) {
 }
 
 // ========================================
-// INICIALIZACIÓN UNIFICADA
+// INICIALIZACIÓN UNIFICADA MEJORADA
 // ========================================
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Inicializando aplicación...');
+    
     // 1. NAVEGACIÓN MÓVIL
     const navToggle = document.getElementById('navToggle');
     const navMenu = document.querySelector('.nav-menu');
@@ -718,16 +925,34 @@ document.addEventListener('DOMContentLoaded', function() {
     // 2. DETECTAR Y INICIALIZAR CALCULADORA CORRECTA
     const oldCalculator = document.getElementById('vehicleModel');
     const newCalculator = document.getElementById('includeVehicle');
+    const panelSelector = document.getElementById('panelType');
     
     if (newCalculator) {
         // Inicializar calculadora nueva
         initNewCalculator();
+        console.log('✅ Calculadora nueva inicializada');
     } else if (oldCalculator) {
         // Usar calculadora antigua
         initCalculator();
+        console.log('✅ Calculadora antigua inicializada');
     }
     
-    // 3. ANIMACIONES AL SCROLL
+    // 3. VERIFICAR MÓDULO DE PANELES
+    if (window.PanelModule) {
+        console.log('✅ Módulo de paneles detectado y listo');
+        
+        // Escuchar eventos del módulo de paneles
+        document.addEventListener('panelChanged', function(e) {
+            console.log('📋 Panel changed:', e.detail.panelType);
+            
+            // Actualizar preview en tiempo real si es necesario
+            updateCalculationPreview(e.detail);
+        });
+    } else {
+        console.warn('⚠️ Módulo de paneles no detectado');
+    }
+    
+    // 4. ANIMACIONES AL SCROLL
     const observerOptions = {
         threshold: 0.1,
         rootMargin: '0px 0px -100px 0px'
@@ -745,22 +970,26 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.stat-card, .benefit-card, .product-card').forEach(el => {
         observer.observe(el);
     });
+    
+    // 5. GUARDAR CONTENIDO ORIGINAL DEL BOTÓN CALCULAR
+    const calculateBtn = document.querySelector('.calculate-btn');
+    if (calculateBtn) {
+        calculateBtn.dataset.originalContent = calculateBtn.innerHTML;
+    }
+    
+    console.log('✅ Inicialización completa');
 });
 
 // Función para inicializar la calculadora nueva
 function initNewCalculator() {
-    console.log('Calculadora nueva inicializada');
-    
-    // Inicializar eventos específicos de la nueva calculadora
-    // Por ejemplo, el toggle del vehículo ya tiene onclick en el HTML
-    // pero podemos agregar más inicializaciones aquí si es necesario
+    console.log('🔧 Inicializando calculadora nueva...');
     
     // Verificar que los elementos existen
     const vehicleToggle = document.getElementById('includeVehicle');
     const vehicleContent = document.getElementById('vehicleContent');
     
     if (vehicleToggle && vehicleContent) {
-        console.log('Toggle de vehículo encontrado y listo');
+        console.log('✅ Toggle de vehículo encontrado y listo');
     }
     
     // Inicializar el slider si existe
@@ -773,4 +1002,82 @@ function initNewCalculator() {
     if (dailyEvKm) {
         dailyEvKm.addEventListener('change', updateKmSlider);
     }
+    
+    // Verificar selector de paneles
+    const panelSelector = document.getElementById('panelType');
+    if (panelSelector) {
+        console.log('✅ Selector de paneles encontrado');
+    } else {
+        console.warn('⚠️ Selector de paneles no encontrado');
+    }
 }
+
+// ========================================
+// FUNCIONES PARA DISCLAIMER DE COSTOS
+// ========================================
+
+function showQuoteOptions() {
+    document.getElementById('quoteModal').style.display = 'flex';
+    
+    // Analytics
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'quote_request_opened', {
+            'event_category': 'engagement'
+        });
+    }
+}
+
+function closeQuoteModal() {
+    document.getElementById('quoteModal').style.display = 'none';
+}
+
+function requestEmailQuote() {
+    // Implementar lógica para solicitud por email
+    alert('Funcionalidad en desarrollo: Solicitud por email\n\nPor ahora, contacta directamente con nuestros partners en la sección "Equipamiento Solar".');
+    closeQuoteModal();
+    
+    // Scroll a sección de equipamiento
+    document.getElementById('equipamiento').scrollIntoView({ behavior: 'smooth' });
+}
+
+function scheduleCall() {
+    // Implementar lógica para programar llamada
+    alert('Funcionalidad en desarrollo: Programar llamada\n\nPor ahora, puedes contactar directamente con los instaladores recomendados.');
+    closeQuoteModal();
+    
+    // Scroll a sección de equipamiento
+    document.getElementById('equipamiento').scrollIntoView({ behavior: 'smooth' });
+}
+
+function showInstallers() {
+    // Redirigir a sección de instaladores
+    closeQuoteModal();
+    document.getElementById('equipamiento').scrollIntoView({ behavior: 'smooth' });
+}
+
+// Mostrar disclaimer cuando se muestren los resultados
+function showCostDisclaimer() {
+    const disclaimer = document.getElementById('costDisclaimer');
+    if (disclaimer) {
+        disclaimer.style.display = 'block';
+        // Pequeño delay para que aparezca después de los resultados
+        setTimeout(() => {
+            disclaimer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 1000);
+    }
+}
+
+// Cerrar modal al presionar Escape
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeQuoteModal();
+    }
+});
+
+// Cerrar modal al hacer click fuera
+document.addEventListener('click', function(e) {
+    const modal = document.getElementById('quoteModal');
+    if (e.target === modal) {
+        closeQuoteModal();
+    }
+});

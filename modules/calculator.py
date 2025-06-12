@@ -6,17 +6,19 @@ class SolarCalculator:
     """
     Módulo para realizar todos los cálculos relacionados con sistemas solares
     incluyendo consumo del hogar y vehículos eléctricos/híbridos
+    MODIFICADO: Soporte para diferentes potencias de paneles solares
     """
     
     def __init__(self):
         # Cargar datos de configuración
         self.locations = self._load_locations()
         self.vehicles = self._load_vehicles()
+        self.panel_options = self._load_panel_options()  # NUEVO
         
         # Constantes del sistema
         self.SYSTEM_LOSSES = 0.20  # 20% pérdidas del sistema
-        self.PANEL_POWER_W = 450  # Watts por panel estándar
-        self.PANEL_AREA_M2 = 2.3  # Área por panel en m²
+        # REMOVIDO: self.PANEL_POWER_W = 450  # Ahora es variable según selección
+        self.PANEL_AREA_M2 = 2.3  # Área por panel en m² (promedio, ahora variable)
         self.COST_PER_KW_INSTALLED = 25000  # Costo por kW instalado en MXN
         self.SENER_INCENTIVE_RATE = 0.25  # 25% de incentivo SENER
         self.CFE_RATE_PER_KWH = 3.5  # Tarifa promedio CFE
@@ -89,6 +91,49 @@ class SolarCalculator:
                 }
             }
     
+    def _load_panel_options(self) -> Dict:
+        """Cargar opciones de paneles disponibles"""
+        panels_path = os.path.join('config', 'panels.json')
+        try:
+            with open(panels_path, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except FileNotFoundError:
+            # Valores por defecto si no existe el archivo
+            return {
+                "450w": {
+                    "name": "Panel 450W (Estándar)",
+                    "power": 450,
+                    "area_m2": 2.3,
+                    "efficiency": 20.5,
+                    "description": "Panel solar monocristalino estándar, ideal para comenzar en energía solar",
+                    "technology": "Monocristalino PERC"
+                },
+                "500w": {
+                    "name": "Panel 500W (Alta Eficiencia)",
+                    "power": 500,
+                    "area_m2": 2.4,
+                    "efficiency": 21.8,
+                    "description": "Panel solar de alta eficiencia, mejor relación costo-beneficio",
+                    "technology": "Monocristalino Half-Cell"
+                },
+                "550w": {
+                    "name": "Panel 550W (Premium)",
+                    "power": 550,
+                    "area_m2": 2.5,
+                    "efficiency": 22.5,
+                    "description": "Panel solar premium para máxima generación en espacios limitados",
+                    "technology": "Monocristalino Bifacial"
+                },
+                "600w": {
+                    "name": "Panel 600W (Ultra Premium)",
+                    "power": 600,
+                    "area_m2": 2.6,
+                    "efficiency": 23.2,
+                    "description": "Panel solar ultra premium de última generación, máxima eficiencia",
+                    "technology": "Monocristalino TOPCon"
+                }
+            }
+    
     def get_locations(self) -> List[Dict]:
         """Obtener lista de ubicaciones para el frontend"""
         return [
@@ -124,6 +169,55 @@ class SolarCalculator:
         
         return vehicles_list
     
+    def get_panel_options(self) -> List[Dict]:
+        """Obtener lista de opciones de paneles para el frontend"""
+        return [
+            {
+                "value": key,
+                "name": data["name"],
+                "power": data["power"],
+                "area_m2": data["area_m2"],
+                "efficiency": data["efficiency"],
+                "description": data["description"],
+                "technology": data.get("technology", "Monocristalino")
+            }
+            for key, data in self.panel_options.items()
+        ]
+    
+    def calculate_panels_needed_precise(self, 
+                                      total_energy_kwh_bimestral: float, 
+                                      hsp: float, 
+                                      panel_power_w: int) -> Tuple[int, float]:
+        """
+        Calcular paneles necesarios usando la fórmula específica proporcionada
+        
+        Args:
+            total_energy_kwh_bimestral: Energía total requerida en el bimestre (kWh)
+            hsp: Horas Sol Pico de la ubicación
+            panel_power_w: Potencia del panel en watts
+            
+        Returns:
+            Tuple: (numero_paneles, kwh_por_panel_bimestral)
+        """
+        # Paso 1: Calcular kWh que genera un panel por día
+        kwh_per_panel_per_day = (panel_power_w * hsp) / 1000
+        
+        # Paso 2: Calcular kWh que genera un panel en 60 días (bimestre)
+        kwh_per_panel_bimestral = kwh_per_panel_per_day * 60
+        
+        # Paso 3: Calcular paneles necesarios
+        # Nota: Agregamos factor de pérdidas del sistema
+        kwh_per_panel_bimestral_real = kwh_per_panel_bimestral * (1 - self.SYSTEM_LOSSES)
+        
+        panels_needed_exact = total_energy_kwh_bimestral / kwh_per_panel_bimestral_real
+        panels_needed_rounded = int(panels_needed_exact)
+        
+        # Siempre redondear hacia arriba para cubrir la demanda
+        if panels_needed_exact > panels_needed_rounded:
+            panels_needed_rounded += 1
+            
+        return panels_needed_rounded, kwh_per_panel_bimestral_real
+    
     def calculate_integral(self,
                     home_consumption: float,
                     location: str,
@@ -131,10 +225,12 @@ class SolarCalculator:
                     vehicle_model: str = "",
                     daily_ev_km: float = 0,
                     custom_battery: Optional[float] = None,
-                    vehicle_efficiency: Optional[float] = None,  # Nuevo
-                    custom_vehicle_name: Optional[str] = None) -> Dict:  # Nuevo
+                    vehicle_efficiency: Optional[float] = None,
+                    custom_vehicle_name: Optional[str] = None,
+                    panel_type: str = "500w") -> Dict:  # NUEVO PARÁMETRO
         """
         Realizar cálculo integral del sistema solar
+        MODIFICADO: Incluye selección de tipo de panel
         
         Args:
             home_consumption: Consumo bimestral del hogar en kWh
@@ -143,8 +239,9 @@ class SolarCalculator:
             vehicle_model: Modelo de vehículo eléctrico/híbrido
             daily_ev_km: Kilómetros diarios en modo eléctrico
             custom_battery: Capacidad de batería personalizada (si aplica)
-            vehicle_efficiency: Eficiencia del vehículo en kWh/100km (para modo avanzado)
+            vehicle_efficiency: Eficiencia del vehículo en kWh/100km
             custom_vehicle_name: Nombre personalizado del vehículo
+            panel_type: Tipo de panel solar seleccionado (NUEVO)
             
         Returns:
             Dict con todos los resultados del cálculo
@@ -154,110 +251,108 @@ class SolarCalculator:
         if location not in self.locations:
             raise ValueError(f"Ubicación inválida: {location}")
         
+        # Validar tipo de panel
+        if panel_type not in self.panel_options:
+            raise ValueError(f"Tipo de panel inválido: {panel_type}")
+        
+        # Obtener datos del panel seleccionado
+        panel_data = self.panel_options[panel_type]
+        panel_power_w = panel_data["power"]
+        panel_area_m2 = panel_data["area_m2"]
+        
         # Obtener HSP de la ubicación
         hsp = self.locations[location]["hsp"]
         
-        # Calcular consumo del hogar
-        monthly_home_consumption = home_consumption / 2
-        annual_home_consumption = monthly_home_consumption * 12
-        daily_home_consumption = annual_home_consumption / 365
-        solar_energy_needed_home = daily_home_consumption * coverage
+        # === CÁLCULO DEL CONSUMO DEL HOGAR ===
+        home_consumption_covered = home_consumption * coverage
         
-        # Inicializar variables del vehículo
-        solar_energy_needed_vehicle = 0
+        # === CÁLCULO DEL CONSUMO DEL VEHÍCULO ===
+        solar_energy_needed_vehicle_bimestral = 0
         vehicle_info = ""
         annual_gas_liters_saved = 0
-        efficiency = 0  # Inicializar para evitar errores
+        efficiency = 0
         
         if vehicle_model and vehicle_model != "":
             if vehicle_model == "custom":
-                # Vehículo personalizado - usar eficiencia proporcionada o calcular
                 if vehicle_efficiency:
                     efficiency = vehicle_efficiency
                 elif custom_battery:
-                    # Si solo tenemos batería, asumir eficiencia default
-                    efficiency = 20  # 20 kWh/100km es un promedio razonable
+                    efficiency = 20  # Valor por defecto
                 else:
-                    raise ValueError("Datos insuficientes para vehículo personalizado. Proporcione eficiencia o capacidad de batería.")
+                    raise ValueError("Datos insuficientes para vehículo personalizado")
                 
                 vehicle_info = custom_vehicle_name or "Vehículo personalizado"
-                
             else:
-                # Vehículo predefinido
                 if vehicle_model not in self.vehicles:
                     raise ValueError(f"Modelo de vehículo inválido: {vehicle_model}")
                 
                 vehicle_data = self.vehicles[vehicle_model]
-                battery_capacity = vehicle_data["battery"]
                 efficiency = vehicle_data["efficiency"]
                 vehicle_info = vehicle_data["name"]
             
-            # Calcular consumo del vehículo (común para ambos casos)
+            # Calcular consumo del vehículo
             if daily_ev_km > 0:
                 daily_energy_consumption_vehicle = (daily_ev_km * efficiency) / 100
-                solar_energy_needed_vehicle = daily_energy_consumption_vehicle
+                # Convertir a consumo bimestral (60 días)
+                solar_energy_needed_vehicle_bimestral = daily_energy_consumption_vehicle * 60
                 
-                # Calcular gasolina ahorrada
-                vehicle_efficiency_km_per_liter = 15  # Asumir 15 km/L promedio
+                # Calcular gasolina ahorrada anualmente
+                vehicle_efficiency_km_per_liter = 15
                 annual_gas_liters_saved = (daily_ev_km * 365) / vehicle_efficiency_km_per_liter
-            else:
-                # Si no hay km diarios, no hay consumo
-                solar_energy_needed_vehicle = 0
-                annual_gas_liters_saved = 0
         
-        # Si no hay vehículo, todas las variables ya están en 0
+        # === CÁLCULO TOTAL DE ENERGÍA REQUERIDA BIMESTRAL ===
+        total_energy_needed_bimestral = home_consumption_covered + solar_energy_needed_vehicle_bimestral
         
-        # Calcular sistema solar total necesario
-        total_daily_energy_needed = solar_energy_needed_home + solar_energy_needed_vehicle
-        
-        # Calcular potencia del sistema considerando pérdidas
-        system_power_kw = total_daily_energy_needed / (hsp * (1 - self.SYSTEM_LOSSES))
-        
-        # Calcular número de paneles
-        number_of_panels = int((system_power_kw * 1000) / self.PANEL_POWER_W)
-        if (system_power_kw * 1000) % self.PANEL_POWER_W > 0:
-            number_of_panels += 1
+        # === NUEVO CÁLCULO DE PANELES USANDO FÓRMULA ESPECÍFICA ===
+        number_of_panels, kwh_per_panel_bimestral = self.calculate_panels_needed_precise(
+            total_energy_needed_bimestral, hsp, panel_power_w
+        )
         
         # Asegurar mínimo 1 panel si hay consumo
-        if total_daily_energy_needed > 0 and number_of_panels == 0:
+        if total_energy_needed_bimestral > 0 and number_of_panels == 0:
             number_of_panels = 1
         
-        # Recalcular potencia real del sistema basada en paneles
-        actual_system_power_kw = (number_of_panels * self.PANEL_POWER_W) / 1000
+        # === CÁLCULOS DERIVADOS ===
+        # Potencia real del sistema basada en paneles
+        actual_system_power_kw = (number_of_panels * panel_power_w) / 1000
         
-        # Calcular costos
+        # Generación anual del sistema
+        daily_generation = (actual_system_power_kw * hsp * (1 - self.SYSTEM_LOSSES))
+        annual_solar_generation = daily_generation * 365
+        
+        # Cálculo de costos - Usando método general basado en potencia del sistema
         total_system_cost = actual_system_power_kw * self.COST_PER_KW_INSTALLED
         sener_incentive = total_system_cost * self.SENER_INCENTIVE_RATE
         net_cost = total_system_cost - sener_incentive
         
-        # Calcular generación anual del sistema
-        annual_solar_generation = actual_system_power_kw * hsp * 365 * (1 - self.SYSTEM_LOSSES)
-        
         # Calcular ahorros
+        monthly_home_consumption = home_consumption / 2
+        annual_home_consumption = monthly_home_consumption * 12
         annual_electricity_savings = min(annual_solar_generation, annual_home_consumption) * self.CFE_RATE_PER_KWH
         annual_gas_savings = annual_gas_liters_saved * self.GAS_PRICE_PER_LITER
         total_annual_savings = annual_electricity_savings + annual_gas_savings
         
-        # Calcular periodo de recuperación
+        # Métricas financieras
         payback_years = net_cost / total_annual_savings if total_annual_savings > 0 else 999
-        
-        # Calcular impacto ambiental
-        annual_co2_avoided_electric = (annual_solar_generation * self.CO2_PER_KWH) / 1000  # Toneladas
-        annual_co2_avoided_gas = (annual_gas_liters_saved * self.CO2_PER_LITER_GAS) / 1000  # Toneladas
-        total_co2_avoided = annual_co2_avoided_electric + annual_co2_avoided_gas
-        
-        # Calcular área de techo requerida
-        total_roof_area = number_of_panels * self.PANEL_AREA_M2
-        
-        # Calcular ROI a 25 años
         total_savings_25_years = total_annual_savings * 25
         roi_25_years = ((total_savings_25_years - net_cost) / net_cost) * 100 if net_cost > 0 else 0
+        
+        # Impacto ambiental
+        annual_co2_avoided_electric = (annual_solar_generation * self.CO2_PER_KWH) / 1000
+        annual_co2_avoided_gas = (annual_gas_liters_saved * self.CO2_PER_LITER_GAS) / 1000
+        total_co2_avoided = annual_co2_avoided_electric + annual_co2_avoided_gas
+        
+        # Área de techo requerida
+        total_roof_area = number_of_panels * panel_area_m2
         
         return {
             # Sistema
             "systemPowerKw": round(actual_system_power_kw, 2),
             "numberOfPanels": number_of_panels,
             "totalRoofArea": round(total_roof_area, 1),
+            "panelType": panel_data["name"],  # NUEVO
+            "panelPowerW": panel_power_w,     # NUEVO
+            "kwh_per_panel_bimestral": round(kwh_per_panel_bimestral, 1),  # NUEVO
             
             # Costos
             "totalSystemCost": round(total_system_cost, 2),
@@ -276,7 +371,7 @@ class SolarCalculator:
             
             # Impacto ambiental
             "totalCo2Avoided": round(total_co2_avoided, 2),
-            "treesEquivalent": round(total_co2_avoided * 16.5, 0),  # 1 árbol absorbe ~60kg CO2/año
+            "treesEquivalent": round(total_co2_avoided * 16.5, 0),
             
             # Información del vehículo
             "vehicleInfo": vehicle_info,
@@ -285,7 +380,7 @@ class SolarCalculator:
             
             # Generación
             "annualSolarGeneration": round(annual_solar_generation, 0),
-            "dailyGeneration": round(annual_solar_generation / 365, 1),
+            "dailyGeneration": round(daily_generation, 1),
             
             # Metadatos
             "location": self.locations[location]["name"],
@@ -372,5 +467,3 @@ class SolarCalculator:
             "autonomyDays": autonomy_days,
             "usableCapacityKwh": round(battery_capacity_kwh * DEPTH_OF_DISCHARGE, 1)
         }
-
-

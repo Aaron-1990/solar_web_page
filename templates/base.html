@@ -28,6 +28,8 @@
     
     <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <!-- NUEVO: CSS modular para paneles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/panels.css') }}">
     {% block extra_css %}{% endblock %}
     
     <!-- Google Analytics -->
@@ -144,6 +146,8 @@
 
     <!-- Scripts -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <!-- NUEVO: JavaScript modular para paneles -->
+    <script src="{{ url_for('static', filename='js/panels.js') }}"></script>
     {% block extra_js %}{% endblock %}
     
     <!-- Schema.org Markup -->
