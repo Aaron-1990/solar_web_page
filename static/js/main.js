@@ -253,15 +253,10 @@ async function calculateIntegralNew() {
 }
 
 // ========================================
-// FUNCIÓN UNIFICADA PARA MOSTRAR RESULTADOS
-// Reemplaza tanto displayImprovedResults() como displayImprovedResultsWithPanels()
+// FUNCIÓN DISPLAYRESULTS MEJORADA - CON DESGLOSE SEPARADO
+// Reemplazar en static/js/main.js
 // ========================================
 
-/**
- * Función unificada para mostrar resultados de cálculo solar
- * Detecta automáticamente si tiene información de paneles y se adapta
- * @param {Object} results - Resultados del cálculo solar
- */
 function displayResults(results) {
     const resultsSection = document.getElementById('results');
     const resultsSummary = document.getElementById('resultsSummary');
@@ -286,7 +281,6 @@ function displayResults(results) {
         let summaryText;
         
         if (hasPanelDetails) {
-            // Resumen con información detallada de paneles
             summaryText = results.hasVehicle 
                 ? `${results.numberOfPanels} paneles de ${results.panelPowerW}W • Ahorro anual de $${results.totalAnnualSavings.toLocaleString()}`
                 : `${results.numberOfPanels} paneles de ${results.panelPowerW}W para tu hogar • Ahorro anual de $${results.totalAnnualSavings.toLocaleString()}`;
@@ -301,7 +295,6 @@ function displayResults(results) {
                 </div>
             `;
         } else {
-            // Resumen básico (fallback)
             summaryText = results.hasVehicle 
                 ? `Sistema de ${results.systemPowerKw} kW • Ahorro anual de $${results.totalAnnualSavings.toLocaleString()}`
                 : `Sistema de ${results.systemPowerKw} kW para tu hogar • Ahorro anual de $${results.totalAnnualSavings.toLocaleString()}`;
@@ -315,7 +308,7 @@ function displayResults(results) {
     }
     
     // ================================
-    // GRID DE RESULTADOS
+    // GRID DE RESULTADOS (SIN DESGLOSE)
     // ================================
     
     // Resultados de vehículo (si aplica)
@@ -356,7 +349,7 @@ function displayResults(results) {
         `;
     }
     
-    // Construir grid completo
+    // Construir grid SIN el desglose
     resultsGrid.innerHTML = `
         ${panelCard}
         <div class="result-card highlight">
@@ -387,7 +380,7 @@ function displayResults(results) {
         </div>
         <div class="result-card">
             <div class="result-icon">💵</div>
-            <div class="result-value">$${results.monthlySavings.toLocaleString()}</div>
+            <div class="result-value">${results.monthlySavings.toLocaleString()}</div>
             <div class="result-label">Ahorro Mensual Promedio</div>
         </div>
         <div class="result-card">
@@ -403,74 +396,95 @@ function displayResults(results) {
     `;
     
     // ================================
-    // DESGLOSE DETALLADO (Solo si hay info de paneles)
+    // NUEVA SECCIÓN: DESGLOSE SEPARADO E INDEPENDIENTE
     // ================================
     if (hasPanelDetails) {
-        const detailedCalc = document.createElement('div');
-        detailedCalc.className = 'calculation-breakdown';
-        detailedCalc.innerHTML = `
-            <h5>📊 Desglose del Cálculo</h5>
-            <div class="breakdown-grid">
-                <div class="breakdown-item">
-                    <span class="breakdown-label">Panel seleccionado:</span>
-                    <span class="breakdown-value">${results.panelType}</span>
-                </div>
-                <div class="breakdown-item">
-                    <span class="breakdown-label">Generación teórica por panel (bimestral):</span>
-                    <span class="breakdown-value">${(results.kwh_per_panel_bimestral / 0.8).toFixed(1)} kWh</span>
-                </div>
-                <div class="breakdown-item">
-                    <span class="breakdown-label">Generación real por panel (bimestral):</span>
-                    <span class="breakdown-value">${results.kwh_per_panel_bimestral} kWh</span>
-                </div>
-                <div class="breakdown-item">
-                    <span class="breakdown-label">Generación total diaria:</span>
-                    <span class="breakdown-value">${results.dailyGeneration} kWh</span>
-                </div>
-                <div class="breakdown-item">
-                    <span class="breakdown-label">Generación anual:</span>
-                    <span class="breakdown-value">${results.annualSolarGeneration.toLocaleString()} kWh</span>
-                </div>
-                <div class="breakdown-item">
-                    <span class="breakdown-label">HSP de tu ubicación:</span>
-                    <span class="breakdown-value">${results.hsp} horas</span>
-                </div>
-                <div class="breakdown-item">
-                    <span class="breakdown-label">Cobertura seleccionada:</span>
-                    <span class="breakdown-value">${results.coverage}%</span>
-                </div>
-            </div>
+        // Buscar o crear contenedor para el desglose
+        let breakdownContainer = document.getElementById('calculationBreakdownSection');
+        
+        if (!breakdownContainer) {
+            // Crear nueva sección después de resultsSection
+            breakdownContainer = document.createElement('div');
+            breakdownContainer.id = 'calculationBreakdownSection';
+            breakdownContainer.className = 'calculation-breakdown-section full-rounded';
             
-            <!-- NUEVA SECCIÓN: Explicación de pérdidas del sistema -->
-            <div class="system-losses-explanation">
-                <div class="explanation-header">
-                    <h6>🔧 Explicación de Pérdidas del Sistema (20%)</h6>
-                    <span class="info-toggle" onclick="toggleSystemLossesInfo()">ℹ️ Ver detalles</span>
-                </div>
-                <div class="calculation-note">
-                    <p class="note-main">
-                        <strong>¿Por qué 20% de pérdidas?</strong> Los sistemas solares tienen pérdidas operativas normales 
-                        que reducen la generación teórica. Esto es estándar en la industria y está incluido en nuestros cálculos.
-                    </p>
-                    <div class="losses-breakdown" id="lossesBreakdown" style="display: none;">
-                        <h6>Desglose de pérdidas típicas:</h6>
-                        <ul class="losses-list">
-                            <li>🔌 <strong>Inversor:</strong> 4-6% (conversión DC a AC)</li>
-                            <li>⚡ <strong>Cables:</strong> 1-3% (resistencia eléctrica)</li>
-                            <li>🌡️ <strong>Temperatura:</strong> 5-10% (paneles se calientan)</li>
-                            <li>☁️ <strong>Sombreado parcial:</strong> 0-5% (nubes, objetos)</li>
-                            <li>🧹 <strong>Suciedad/polvo:</strong> 2-5% (mantenimiento)</li>
-                            <li>⚖️ <strong>Desajuste de paneles:</strong> 1-3% (tolerancias de fabricación)</li>
-                        </ul>
-                        <div class="losses-total">
-                            <strong>Total promedio: 15-25% (usamos 20% conservador)</strong>
+            // Insertar después de la sección de resultados
+            resultsSection.parentNode.insertBefore(breakdownContainer, resultsSection.nextSibling);
+        }
+        
+        // Contenido del desglose independiente
+        breakdownContainer.innerHTML = `
+            <div class="container">
+                <div class="calculation-breakdown">
+                    <h5>📊 Desglose Detallado del Cálculo</h5>
+                    
+                    <div class="breakdown-grid">
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Panel seleccionado:</span>
+                            <span class="breakdown-value">${results.panelType}</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Generación teórica por panel (bimestral):</span>
+                            <span class="breakdown-value">${(results.kwh_per_panel_bimestral / 0.8).toFixed(1)} kWh</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Generación real por panel (bimestral):</span>
+                            <span class="breakdown-value">${results.kwh_per_panel_bimestral} kWh</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Generación total diaria:</span>
+                            <span class="breakdown-value">${results.dailyGeneration} kWh</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Generación anual:</span>
+                            <span class="breakdown-value">${results.annualSolarGeneration.toLocaleString()} kWh</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">HSP de tu ubicación:</span>
+                            <span class="breakdown-value">${results.hsp} horas</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Cobertura seleccionada:</span>
+                            <span class="breakdown-value">${results.coverage}%</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Explicación de pérdidas del sistema -->
+                    <div class="system-losses-explanation">
+                        <div class="explanation-header">
+                            <h6>🔧 Explicación de Pérdidas del Sistema (20%)</h6>
+                            <span class="info-toggle" onclick="toggleSystemLossesInfo()">ℹ️ Ver detalles</span>
+                        </div>
+                        <div class="calculation-note">
+                            <p class="note-main">
+                                <strong>¿Por qué 20% de pérdidas?</strong> Los sistemas solares tienen pérdidas operativas normales 
+                                que reducen la generación teórica. Esto es estándar en la industria y está incluido en nuestros cálculos.
+                            </p>
+                            <div class="losses-breakdown" id="lossesBreakdown" style="display: none;">
+                                <h6>Desglose de pérdidas típicas:</h6>
+                                <ul class="losses-list">
+                                    <li>🔌 <strong>Inversor:</strong> 4-6% (conversión DC a AC)</li>
+                                    <li>⚡ <strong>Cables:</strong> 1-3% (resistencia eléctrica)</li>
+                                    <li>🌡️ <strong>Temperatura:</strong> 5-10% (paneles se calientan)</li>
+                                    <li>☁️ <strong>Sombreado parcial:</strong> 0-5% (nubes, objetos)</li>
+                                    <li>🧹 <strong>Suciedad/polvo:</strong> 2-5% (mantenimiento)</li>
+                                    <li>⚖️ <strong>Desajuste de paneles:</strong> 1-3% (tolerancias de fabricación)</li>
+                                </ul>
+                                <div class="losses-total">
+                                    <strong>Total promedio: 15-25% (usamos 20% conservador)</strong>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         `;
-        
-        resultsGrid.appendChild(detailedCalc);
+    } else {
+        // Si no hay detalles de paneles, ocultar/remover la sección de desglose
+        const existingBreakdown = document.getElementById('calculationBreakdownSection');
+        if (existingBreakdown) {
+            existingBreakdown.style.display = 'none';
+        }
     }
     
     // ================================
@@ -490,6 +504,7 @@ function displayResults(results) {
     
     console.log('✅ Resultados mostrados correctamente');
 }
+
 
 // NUEVA FUNCIÓN: Toggle para mostrar/ocultar detalles de pérdidas
 function toggleSystemLossesInfo() {
@@ -619,73 +634,6 @@ function setKm(value) {
     event.target.style.backgroundColor = '#e8f5e8';
 }
 
-function displayResults(results) {
-    const resultsSection = document.getElementById('results');
-    const resultsGrid = document.getElementById('resultsGrid');
-    
-    // Construir HTML de resultados
-    let vehicleResults = '';
-    if (results.hasVehicle) {
-        vehicleResults = `
-            <div class="result-card">
-                <div class="result-value">$${results.annualGasSavings.toLocaleString()}</div>
-                <div class="result-label">Ahorro Anual en Gasolina</div>
-            </div>
-            <div class="result-card">
-                <div class="result-value">${results.vehicleInfo}</div>
-                <div class="result-label">Vehículo Incluido</div>
-            </div>
-        `;
-    }
-
-    resultsGrid.innerHTML = `
-        <div class="result-card">
-            <div class="result-value">${results.numberOfPanels}</div>
-            <div class="result-label">Paneles Solares Requeridos</div>
-        </div>
-        <div class="result-card">
-            <div class="result-value">${results.systemPowerKw} kW</div>
-            <div class="result-label">Potencia del Sistema</div>
-        </div>
-        <div class="result-card">
-            <div class="result-value">$${results.totalSystemCost.toLocaleString()}</div>
-            <div class="result-label">Costo Total del Sistema</div>
-        </div>
-        <div class="result-card">
-            <div class="result-value">$${results.senerIncentive.toLocaleString()}</div>
-            <div class="result-label">Incentivo SENER (25%)</div>
-        </div>
-        <div class="result-card">
-            <div class="result-value">$${results.netCost.toLocaleString()}</div>
-            <div class="result-label">Costo Neto a Pagar</div>
-        </div>
-        <div class="result-card">
-            <div class="result-value">$${results.annualElectricitySavings.toLocaleString()}</div>
-            <div class="result-label">Ahorro Anual en Electricidad</div>
-        </div>
-        ${vehicleResults}
-        <div class="result-card">
-            <div class="result-value">$${results.totalAnnualSavings.toLocaleString()}</div>
-            <div class="result-label">Ahorro Total Anual</div>
-        </div>
-        <div class="result-card">
-            <div class="result-value">${results.paybackYears} años</div>
-            <div class="result-label">Periodo de Recuperación</div>
-        </div>
-        <div class="result-card">
-            <div class="result-value">${results.totalCo2Avoided} ton</div>
-            <div class="result-label">CO₂ Evitado Anualmente</div>
-        </div>
-        <div class="result-card">
-            <div class="result-value">${results.totalRoofArea} m²</div>
-            <div class="result-label">Área de Techo Requerida</div>
-        </div>
-    `;
-    
-    // Mostrar sección de resultados
-    resultsSection.style.display = 'block';
-    resultsSection.scrollIntoView({ behavior: 'smooth' });
-}
 
 // ========================================
 // GESTIÓN DE PARTNERS
