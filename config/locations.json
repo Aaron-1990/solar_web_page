@@ -1,0 +1,162 @@
+{
+  "aguascalientes": {
+    "name": "Aguascalientes",
+    "hsp": 5.91,
+    "region": "centro"
+  },
+  "baja-california-norte": {
+    "name": "Baja California",
+    "hsp": 5.27,
+    "region": "noroeste"
+  },
+  "baja-california-sur": {
+    "name": "Baja California Sur",
+    "hsp": 5.59,
+    "region": "noroeste"
+  },
+  "campeche": {
+    "name": "Campeche",
+    "hsp": 5.85,
+    "region": "sureste"
+  },
+  "chiapas": {
+    "name": "Chiapas",
+    "hsp": 5.15,
+    "region": "sur"
+  },
+  "chihuahua": {
+    "name": "Chihuahua",
+    "hsp": 5.59,
+    "region": "norte"
+  },
+  "coahuila": {
+    "name": "Coahuila",
+    "hsp": 5.37,
+    "region": "norte"
+  },
+  "colima": {
+    "name": "Colima",
+    "hsp": 5.61,
+    "region": "occidente"
+  },
+  "ciudad-de-mexico": {
+    "name": "Ciudad de México",
+    "hsp": 5.46,
+    "region": "centro"
+  },
+  "durango": {
+    "name": "Durango",
+    "hsp": 5.73,
+    "region": "norte"
+  },
+  "estado-de-mexico": {
+    "name": "Estado de México",
+    "hsp": 5.46,
+    "region": "centro"
+  },
+  "guanajuato": {
+    "name": "Guanajuato",
+    "hsp": 5.79,
+    "region": "centro"
+  },
+  "guerrero": {
+    "name": "Guerrero",
+    "hsp": 5.91,
+    "region": "sur"
+  },
+  "hidalgo": {
+    "name": "Hidalgo",
+    "hsp": 5.16,
+    "region": "centro"
+  },
+  "jalisco": {
+    "name": "Jalisco",
+    "hsp": 5.81,
+    "region": "occidente"
+  },
+  "michoacan": {
+    "name": "Michoacán",
+    "hsp": 5.58,
+    "region": "occidente"
+  },
+  "morelos": {
+    "name": "Morelos",
+    "hsp": 5.94,
+    "region": "centro"
+  },
+  "nayarit": {
+    "name": "Nayarit",
+    "hsp": 5.88,
+    "region": "occidente"
+  },
+  "nuevo-leon": {
+    "name": "Nuevo León",
+    "hsp": 5.22,
+    "region": "noreste"
+  },
+  "oaxaca": {
+    "name": "Oaxaca",
+    "hsp": 5.26,
+    "region": "sur"
+  },
+  "puebla": {
+    "name": "Puebla",
+    "hsp": 5.40,
+    "region": "centro"
+  },
+  "queretaro": {
+    "name": "Querétaro",
+    "hsp": 5.86,
+    "region": "centro"
+  },
+  "quintana-roo": {
+    "name": "Quintana Roo",
+    "hsp": 5.34,
+    "region": "sureste"
+  },
+  "san-luis-potosi": {
+    "name": "San Luis Potosí",
+    "hsp": 5.49,
+    "region": "centro"
+  },
+  "sinaloa": {
+    "name": "Sinaloa",
+    "hsp": 5.98,
+    "region": "noroeste"
+  },
+  "sonora": {
+    "name": "Sonora",
+    "hsp": 5.73,
+    "region": "noroeste"
+  },
+  "tabasco": {
+    "name": "Tabasco",
+    "hsp": 4.94,
+    "region": "sureste"
+  },
+  "tamaulipas": {
+    "name": "Tamaulipas",
+    "hsp": 5.08,
+    "region": "noreste"
+  },
+  "tlaxcala": {
+    "name": "Tlaxcala",
+    "hsp": 5.40,
+    "region": "centro"
+  },
+  "veracruz": {
+    "name": "Veracruz",
+    "hsp": 4.60,
+    "region": "sur"
+  },
+  "yucatan": {
+    "name": "Yucatán",
+    "hsp": 5.30,
+    "region": "sureste"
+  },
+  "zacatecas": {
+    "name": "Zacatecas",
+    "hsp": 5.76,
+    "region": "centro"
+  }
+}

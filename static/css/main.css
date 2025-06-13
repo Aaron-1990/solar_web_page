@@ -2049,3 +2049,180 @@ input:checked + .toggle-slider:before {
         margin: 0 0.5rem;
     }
 }
+
+/* Referencia HSP en desglose */
+.breakdown-item.hsp-item {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.5rem 2rem 1.8rem 2rem;
+}
+
+.breakdown-item.hsp-item .breakdown-label,
+.breakdown-item.hsp-item .breakdown-value {
+    align-self: stretch;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.hsp-source-info {
+    width: 100%;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(46, 204, 113, 0.2);
+}
+
+.source-reference {
+    color: #666;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    display: block;
+}
+
+.source-reference strong {
+    color: #2ECC71;
+    font-weight: 600;
+}
+
+.source-detail {
+    color: #888;
+    font-style: italic;
+}
+
+.breakdown-item.hsp-item:hover .source-reference {
+    color: #555;
+}
+
+.breakdown-item.hsp-item:hover .source-reference strong {
+    color: #27AE60;
+}
+
+@media (max-width: 768px) {
+    .source-reference {
+        font-size: 0.75rem;
+    }
+    
+    .source-detail {
+        display: block;
+        margin-top: 0.2rem;
+    }
+}
+
+/* ========================================
+   CORRECCIÓN TOGGLE VEHÍCULO - 2025
+   ======================================== */
+
+/* Contenedor del toggle mejorado */
+.toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-height: 40px;
+}
+
+.toggle-text {
+    font-weight: 500;
+    color: #495057;
+    flex-shrink: 0;
+    min-width: 80px;
+    transition: color 0.3s ease;
+}
+
+/* Toggle switch mejorado */
+.toggle-switch {
+    position: relative;
+    width: 60px;
+    height: 30px;
+    flex-shrink: 0;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 30px;
+    width: 60px;
+    height: 30px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+input:checked + .toggle-slider {
+    background-color: #2ECC71;
+}
+
+input:focus + .toggle-slider {
+    box-shadow: 0 0 1px #2ECC71;
+}
+
+input:checked + .toggle-slider:before {
+    transform: translateX(30px);
+}
+
+.toggle-switch:hover .toggle-slider {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+input:checked + .toggle-slider:hover {
+    background-color: #27AE60;
+}
+
+/* Evitar problemas de layout */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-bottom: 1px solid #e9ecef;
+    min-height: 80px;
+}
+
+.header-left {
+    flex: 1;
+    margin-right: 1rem;
+}
+
+.header-left h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.2rem;
+    color: #495057;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        min-height: auto;
+    }
+    
+    .toggle-container {
+        align-self: flex-end;
+    }
+}

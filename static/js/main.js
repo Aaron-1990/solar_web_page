@@ -439,9 +439,15 @@ function displayResults(results) {
                             <span class="breakdown-label">Generación anual:</span>
                             <span class="breakdown-value">${results.annualSolarGeneration.toLocaleString()} kWh</span>
                         </div>
-                        <div class="breakdown-item">
+                        <div class="breakdown-item hsp-item">
                             <span class="breakdown-label">HSP de tu ubicación:</span>
                             <span class="breakdown-value">${results.hsp} horas</span>
+                            <div class="hsp-source-info">
+                                <small class="source-reference">
+                                    📊 <strong>Fuente:</strong> NASA POWER Database | 
+                                    <span class="source-detail">Datos satelitales validados (±3-5% precisión)</span>
+                                </small>
+                            </div>
                         </div>
                         <div class="breakdown-item">
                             <span class="breakdown-label">Cobertura seleccionada:</span>
@@ -533,29 +539,59 @@ window.toggleSystemLossesInfo = toggleSystemLossesInfo;
 // NUEVAS FUNCIONES PARA CALCULADORA MEJORADA
 // ========================================
 
+//VERSIÓN CORREGIDA:
 function toggleVehicleSection() {
+    // Prevenir propagación del evento
+    if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
+    console.log('🚗 Toggle vehículo activado');
+    
     const checkbox = document.getElementById('includeVehicle');
     const vehicleContent = document.getElementById('vehicleContent');
     const toggleText = document.getElementById('vehicleToggleText');
     const calculationMode = document.getElementById('calculationMode');
     
-    if (checkbox.checked) {
+    // Verificar que todos los elementos existen
+    if (!checkbox || !vehicleContent || !toggleText || !calculationMode) {
+        console.error('❌ Elementos del toggle no encontrados');
+        return;
+    }
+    
+    const isChecked = checkbox.checked;
+    console.log(`📋 Estado checkbox: ${isChecked ? 'ACTIVADO' : 'DESACTIVADO'}`);
+    
+    if (isChecked) {
+        // MOSTRAR sección de vehículo
         vehicleContent.style.display = 'block';
         toggleText.textContent = 'Incluir';
         calculationMode.textContent = 'Calculando para hogar + vehículo eléctrico';
-        // Animar la apertura
-        vehicleContent.style.maxHeight = '0';
+        
+        // Animación de apertura
+        vehicleContent.style.opacity = '0';
+        vehicleContent.style.transform = 'translateY(-10px)';
+        
         setTimeout(() => {
-            vehicleContent.style.maxHeight = '1000px';
-            vehicleContent.style.transition = 'max-height 0.5s ease';
+            vehicleContent.style.opacity = '1';
+            vehicleContent.style.transform = 'translateY(0)';
+            vehicleContent.style.transition = 'all 0.3s ease';
         }, 10);
+        
+        console.log('✅ Sección vehículo MOSTRADA');
+        
     } else {
-        vehicleContent.style.maxHeight = '0';
-        setTimeout(() => {
-            vehicleContent.style.display = 'none';
-        }, 500);
+        // OCULTAR sección de vehículo
+        vehicleContent.style.opacity = '0';
+        vehicleContent.style.transform = 'translateY(-10px)';
         toggleText.textContent = 'No incluir';
         calculationMode.textContent = 'Calculando solo para tu hogar';
+        
+        setTimeout(() => {
+            vehicleContent.style.display = 'none';
+        }, 300);
+        
+        console.log('✅ Sección vehículo OCULTADA');
     }
 }
 
@@ -585,6 +621,20 @@ function handleVehicleSelection() {
     const vehicleModel = document.getElementById('vehicleModel').value;
     const dailyKmSection = document.getElementById('dailyKmSection');
     dailyKmSection.style.display = vehicleModel ? 'block' : 'none';
+}
+
+// OPCIONAL: Función para resetear el toggle si hay problemas
+function resetVehicleToggle() {
+    const checkbox = document.getElementById('includeVehicle');
+    const vehicleContent = document.getElementById('vehicleContent');
+    const toggleText = document.getElementById('vehicleToggleText');
+    
+    if (checkbox && vehicleContent && toggleText) {
+        checkbox.checked = false;
+        vehicleContent.style.display = 'none';
+        toggleText.textContent = 'No incluir';
+        console.log('🔄 Toggle vehículo reseteado');
+    }
 }
 
 // Calcular eficiencia desde batería y autonomía
@@ -951,6 +1001,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     console.log('✅ Inicialización completa');
+    // AGREGAR el event listener del toggle vehículo
+    const vehicleToggle = document.getElementById('includeVehicle');
+    if (vehicleToggle) {
+        vehicleToggle.addEventListener('change', function(event) {
+            toggleVehicleSection(event);
+        });
+        console.log('✅ Event listener del toggle vehículo configurado');
+    }
 });
 
 // Función para inicializar la calculadora nueva
