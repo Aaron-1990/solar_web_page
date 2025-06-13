@@ -202,7 +202,7 @@ async function calculateIntegralNew() {
         
         if (result.success) {
             // Usar la función mejorada de display que incluye información de paneles
-            displayImprovedResultsWithPanels(result.data);
+            displayResults(result.data);
             
             // Disparar evento para el módulo de paneles
             if (window.PanelModule) {
@@ -252,8 +252,17 @@ async function calculateIntegralNew() {
     }
 }
 
-// Función mejorada para mostrar resultados con información modular de paneles
-function displayImprovedResultsWithPanels(results) {
+// ========================================
+// FUNCIÓN UNIFICADA PARA MOSTRAR RESULTADOS
+// Reemplaza tanto displayImprovedResults() como displayImprovedResultsWithPanels()
+// ========================================
+
+/**
+ * Función unificada para mostrar resultados de cálculo solar
+ * Detecta automáticamente si tiene información de paneles y se adapta
+ * @param {Object} results - Resultados del cálculo solar
+ */
+function displayResults(results) {
     const resultsSection = document.getElementById('results');
     const resultsSummary = document.getElementById('resultsSummary');
     const resultsGrid = document.getElementById('resultsGrid');
@@ -263,25 +272,53 @@ function displayImprovedResultsWithPanels(results) {
         return;
     }
     
-    // Verificar si tenemos el elemento de resumen (nuevo diseño)
+    // Detectar si tenemos información detallada de paneles
+    const hasPanelDetails = results.hasOwnProperty('panelType') && 
+                           results.hasOwnProperty('panelPowerW') && 
+                           results.hasOwnProperty('kwh_per_panel_bimestral');
+    
+    console.log(`📊 Mostrando resultados ${hasPanelDetails ? 'con' : 'sin'} detalles de paneles`);
+    
+    // ================================
+    // SECCIÓN DE RESUMEN
+    // ================================
     if (resultsSummary) {
-        // Resumen principal con información de paneles
-        const summaryText = results.hasVehicle 
-            ? `${results.numberOfPanels} paneles de ${results.panelPowerW}W • Ahorro anual de $${results.totalAnnualSavings.toLocaleString()}`
-            : `${results.numberOfPanels} paneles de ${results.panelPowerW}W para tu hogar • Ahorro anual de $${results.totalAnnualSavings.toLocaleString()}`;
-            
-        resultsSummary.innerHTML = `
-            <h4>¡Tu sistema solar ideal está listo!</h4>
-            <p class="main-result">${results.systemPowerKw} kW (${results.panelType})</p>
-            <p class="sub-result">${summaryText}</p>
-            <div class="panel-summary">
-                <span class="panel-detail">Cada panel genera ~${results.kwh_per_panel_bimestral} kWh bimestral</span>
-                <span class="panel-detail">Área total requerida: ${results.totalRoofArea} m²</span>
-            </div>
-        `;
+        let summaryText;
+        
+        if (hasPanelDetails) {
+            // Resumen con información detallada de paneles
+            summaryText = results.hasVehicle 
+                ? `${results.numberOfPanels} paneles de ${results.panelPowerW}W • Ahorro anual de $${results.totalAnnualSavings.toLocaleString()}`
+                : `${results.numberOfPanels} paneles de ${results.panelPowerW}W para tu hogar • Ahorro anual de $${results.totalAnnualSavings.toLocaleString()}`;
+                
+            resultsSummary.innerHTML = `
+                <h4>¡Tu sistema solar ideal está listo!</h4>
+                <p class="main-result">${results.systemPowerKw} kW (${results.panelType})</p>
+                <p class="sub-result">${summaryText}</p>
+                <div class="panel-summary">
+                    <span class="panel-detail">Cada panel genera ~${results.kwh_per_panel_bimestral} kWh bimestral</span>
+                    <span class="panel-detail">Área total requerida: ${results.totalRoofArea} m²</span>
+                </div>
+            `;
+        } else {
+            // Resumen básico (fallback)
+            summaryText = results.hasVehicle 
+                ? `Sistema de ${results.systemPowerKw} kW • Ahorro anual de $${results.totalAnnualSavings.toLocaleString()}`
+                : `Sistema de ${results.systemPowerKw} kW para tu hogar • Ahorro anual de $${results.totalAnnualSavings.toLocaleString()}`;
+                
+            resultsSummary.innerHTML = `
+                <h4>¡Tu sistema solar ideal está listo!</h4>
+                <p class="main-result">${results.numberOfPanels} paneles solares</p>
+                <p class="sub-result">${summaryText}</p>
+            `;
+        }
     }
     
-    // Grid de resultados detallados con iconos
+    // ================================
+    // GRID DE RESULTADOS
+    // ================================
+    
+    // Resultados de vehículo (si aplica)
     let vehicleResults = '';
     if (results.hasVehicle) {
         vehicleResults = `
@@ -298,13 +335,30 @@ function displayImprovedResultsWithPanels(results) {
         `;
     }
     
+    // Tarjeta de paneles (adaptativa)
+    let panelCard;
+    if (hasPanelDetails) {
+        panelCard = `
+            <div class="result-card highlight panel-info">
+                <div class="result-icon">⚡</div>
+                <div class="result-value">${results.numberOfPanels}</div>
+                <div class="result-label">Paneles ${results.panelPowerW}W</div>
+                <div class="result-sublabel">${results.panelType}</div>
+            </div>
+        `;
+    } else {
+        panelCard = `
+            <div class="result-card highlight">
+                <div class="result-icon">⚡</div>
+                <div class="result-value">${results.numberOfPanels}</div>
+                <div class="result-label">Paneles Solares</div>
+            </div>
+        `;
+    }
+    
+    // Construir grid completo
     resultsGrid.innerHTML = `
-        <div class="result-card highlight panel-info">
-            <div class="result-icon">⚡</div>
-            <div class="result-value">${results.numberOfPanels}</div>
-            <div class="result-label">Paneles ${results.panelPowerW}W</div>
-            <div class="result-sublabel">${results.panelType}</div>
-        </div>
+        ${panelCard}
         <div class="result-card highlight">
             <div class="result-icon">💰</div>
             <div class="result-value">$${results.netCost.toLocaleString()}</div>
@@ -348,146 +402,117 @@ function displayImprovedResultsWithPanels(results) {
         </div>
     `;
     
-    // Mostrar información detallada del cálculo con datos del panel
-    const detailedCalc = document.createElement('div');
-    detailedCalc.className = 'calculation-breakdown';
-    detailedCalc.innerHTML = `
-        <h5>📊 Desglose del Cálculo</h5>
-        <div class="breakdown-grid">
-            <div class="breakdown-item">
-                <span class="breakdown-label">Panel seleccionado:</span>
-                <span class="breakdown-value">${results.panelType}</span>
+    // ================================
+    // DESGLOSE DETALLADO (Solo si hay info de paneles)
+    // ================================
+    if (hasPanelDetails) {
+        const detailedCalc = document.createElement('div');
+        detailedCalc.className = 'calculation-breakdown';
+        detailedCalc.innerHTML = `
+            <h5>📊 Desglose del Cálculo</h5>
+            <div class="breakdown-grid">
+                <div class="breakdown-item">
+                    <span class="breakdown-label">Panel seleccionado:</span>
+                    <span class="breakdown-value">${results.panelType}</span>
+                </div>
+                <div class="breakdown-item">
+                    <span class="breakdown-label">Generación teórica por panel (bimestral):</span>
+                    <span class="breakdown-value">${(results.kwh_per_panel_bimestral / 0.8).toFixed(1)} kWh</span>
+                </div>
+                <div class="breakdown-item">
+                    <span class="breakdown-label">Generación real por panel (bimestral):</span>
+                    <span class="breakdown-value">${results.kwh_per_panel_bimestral} kWh</span>
+                </div>
+                <div class="breakdown-item">
+                    <span class="breakdown-label">Generación total diaria:</span>
+                    <span class="breakdown-value">${results.dailyGeneration} kWh</span>
+                </div>
+                <div class="breakdown-item">
+                    <span class="breakdown-label">Generación anual:</span>
+                    <span class="breakdown-value">${results.annualSolarGeneration.toLocaleString()} kWh</span>
+                </div>
+                <div class="breakdown-item">
+                    <span class="breakdown-label">HSP de tu ubicación:</span>
+                    <span class="breakdown-value">${results.hsp} horas</span>
+                </div>
+                <div class="breakdown-item">
+                    <span class="breakdown-label">Cobertura seleccionada:</span>
+                    <span class="breakdown-value">${results.coverage}%</span>
+                </div>
             </div>
-            <div class="breakdown-item">
-                <span class="breakdown-label">Generación por panel (bimestral):</span>
-                <span class="breakdown-value">${results.kwh_per_panel_bimestral} kWh</span>
+            
+            <!-- NUEVA SECCIÓN: Explicación de pérdidas del sistema -->
+            <div class="system-losses-explanation">
+                <div class="explanation-header">
+                    <h6>🔧 Explicación de Pérdidas del Sistema (20%)</h6>
+                    <span class="info-toggle" onclick="toggleSystemLossesInfo()">ℹ️ Ver detalles</span>
+                </div>
+                <div class="calculation-note">
+                    <p class="note-main">
+                        <strong>¿Por qué 20% de pérdidas?</strong> Los sistemas solares tienen pérdidas operativas normales 
+                        que reducen la generación teórica. Esto es estándar en la industria y está incluido en nuestros cálculos.
+                    </p>
+                    <div class="losses-breakdown" id="lossesBreakdown" style="display: none;">
+                        <h6>Desglose de pérdidas típicas:</h6>
+                        <ul class="losses-list">
+                            <li>🔌 <strong>Inversor:</strong> 4-6% (conversión DC a AC)</li>
+                            <li>⚡ <strong>Cables:</strong> 1-3% (resistencia eléctrica)</li>
+                            <li>🌡️ <strong>Temperatura:</strong> 5-10% (paneles se calientan)</li>
+                            <li>☁️ <strong>Sombreado parcial:</strong> 0-5% (nubes, objetos)</li>
+                            <li>🧹 <strong>Suciedad/polvo:</strong> 2-5% (mantenimiento)</li>
+                            <li>⚖️ <strong>Desajuste de paneles:</strong> 1-3% (tolerancias de fabricación)</li>
+                        </ul>
+                        <div class="losses-total">
+                            <strong>Total promedio: 15-25% (usamos 20% conservador)</strong>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="breakdown-item">
-                <span class="breakdown-label">Generación total diaria:</span>
-                <span class="breakdown-value">${results.dailyGeneration} kWh</span>
-            </div>
-            <div class="breakdown-item">
-                <span class="breakdown-label">Generación anual:</span>
-                <span class="breakdown-value">${results.annualSolarGeneration.toLocaleString()} kWh</span>
-            </div>
-            <div class="breakdown-item">
-                <span class="breakdown-label">HSP de tu ubicación:</span>
-                <span class="breakdown-value">${results.hsp} horas</span>
-            </div>
-            <div class="breakdown-item">
-                <span class="breakdown-label">Cobertura seleccionada:</span>
-                <span class="breakdown-value">${results.coverage}%</span>
-            </div>
-        </div>
-    `;
+        `;
+        
+        resultsGrid.appendChild(detailedCalc);
+    }
     
-    resultsGrid.appendChild(detailedCalc);
-    
-    // Mostrar sección de resultados con animación
+    // ================================
+    // MOSTRAR Y ANIMAR RESULTADOS
+    // ================================
     resultsSection.style.display = 'block';
     resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     
-    // Mostrar disclaimer de costos si existe la función
+    // Funciones auxiliares
     if (typeof showCostDisclaimer === 'function') {
         showCostDisclaimer();
     }
     
-    // Animar los números si la función existe
     if (typeof animateNumbers === 'function') {
         animateNumbers();
+    }
+    
+    console.log('✅ Resultados mostrados correctamente');
+}
+
+// NUEVA FUNCIÓN: Toggle para mostrar/ocultar detalles de pérdidas
+function toggleSystemLossesInfo() {
+    const lossesBreakdown = document.getElementById('lossesBreakdown');
+    const toggleBtn = document.querySelector('.info-toggle');
+    
+    if (!lossesBreakdown || !toggleBtn) {
+        console.warn('⚠️ Elementos de toggle no encontrados');
+        return;
+    }
+    
+    if (lossesBreakdown.style.display === 'none') {
+        lossesBreakdown.style.display = 'block';
+        toggleBtn.textContent = '❌ Ocultar detalles';
+        lossesBreakdown.style.animation = 'fadeIn 0.3s ease';
+    } else {
+        lossesBreakdown.style.display = 'none';
+        toggleBtn.textContent = 'ℹ️ Ver detalles';
     }
 }
 
-// Función mejorada para mostrar resultados con el nuevo diseño (fallback)
-function displayImprovedResults(results) {
-    const resultsSection = document.getElementById('results');
-    const resultsSummary = document.getElementById('resultsSummary');
-    const resultsGrid = document.getElementById('resultsGrid');
-    
-    // Verificar si tenemos el elemento de resumen (nuevo diseño)
-    if (resultsSummary) {
-        // Resumen principal con diseño mejorado
-        let summaryText = results.hasVehicle 
-            ? `Sistema de ${results.systemPowerKw} kW • Ahorro anual de $${results.totalAnnualSavings.toLocaleString()}`
-            : `Sistema de ${results.systemPowerKw} kW para tu hogar • Ahorro anual de $${results.totalAnnualSavings.toLocaleString()}`;
-            
-        resultsSummary.innerHTML = `
-            <h4>¡Tu sistema solar ideal está listo!</h4>
-            <p class="main-result">${results.numberOfPanels} paneles solares</p>
-            <p class="sub-result">${summaryText}</p>
-        `;
-    }
-    
-    // Grid de resultados detallados con iconos
-    let vehicleResults = '';
-    if (results.hasVehicle) {
-        vehicleResults = `
-            <div class="result-card">
-                <div class="result-icon">⛽</div>
-                <div class="result-value">$${results.annualGasSavings.toLocaleString()}</div>
-                <div class="result-label">Ahorro Anual en Gasolina</div>
-            </div>
-            <div class="result-card">
-                <div class="result-icon">🚗</div>
-                <div class="result-value">${results.vehicleInfo}</div>
-                <div class="result-label">Vehículo Incluido</div>
-            </div>
-        `;
-    }
-    
-    resultsGrid.innerHTML = `
-        <div class="result-card highlight">
-            <div class="result-icon">💰</div>
-            <div class="result-value">$${results.netCost.toLocaleString()}</div>
-            <div class="result-label">Inversión Total (con incentivos)</div>
-        </div>
-        <div class="result-card">
-            <div class="result-icon">⚡</div>
-            <div class="result-value">$${results.annualElectricitySavings.toLocaleString()}</div>
-            <div class="result-label">Ahorro Anual en Electricidad</div>
-        </div>
-        ${vehicleResults}
-        <div class="result-card">
-            <div class="result-icon">📅</div>
-            <div class="result-value">${results.paybackYears} años</div>
-            <div class="result-label">Recuperación de Inversión</div>
-        </div>
-        <div class="result-card">
-            <div class="result-icon">🌱</div>
-            <div class="result-value">${results.totalCo2Avoided} ton</div>
-            <div class="result-label">CO₂ Evitado Anualmente</div>
-        </div>
-        <div class="result-card">
-            <div class="result-icon">🏠</div>
-            <div class="result-value">${results.totalRoofArea} m²</div>
-            <div class="result-label">Área de Techo Requerida</div>
-        </div>
-        <div class="result-card">
-            <div class="result-icon">💵</div>
-            <div class="result-value">${results.monthlySavings.toLocaleString()}</div>
-            <div class="result-label">Ahorro Mensual Promedio</div>
-        </div>
-        <div class="result-card">
-            <div class="result-icon">📈</div>
-            <div class="result-value">${results.roi25Years}%</div>
-            <div class="result-label">ROI a 25 años</div>
-        </div>
-        <div class="result-card">
-            <div class="result-icon">🌳</div>
-            <div class="result-value">${Math.round(results.treesEquivalent)}</div>
-            <div class="result-label">Árboles Equivalentes</div>
-        </div>
-    `;
-    
-    // Mostrar sección de resultados con animación
-    resultsSection.style.display = 'block';
-    resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    
-    // Animar los números si la función existe
-    if (typeof animateNumbers === 'function') {
-        animateNumbers();
-    }
-}
+// Hacer funciones globales
+window.toggleSystemLossesInfo = toggleSystemLossesInfo;
 
 // ========================================
 // NUEVAS FUNCIONES PARA CALCULADORA MEJORADA
