@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Sun Depot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f6fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .admin-header {
+            background: linear-gradient(135deg, #2ECC71, #27AE60);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(46, 204, 113, 0.3);
+        }
+        
+        .admin-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .admin-header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2ECC71;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .data-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #2ECC71;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .data-table th,
+        .data-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .data-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .no-data {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 20px;
+        }
+        
+        .nav-link {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 6px;
+            margin: 10px 10px 0 0;
+            transition: background 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            background: #2980b9;
+        }
+        
+        .marketplace-link {
+            background: #e74c3c;
+        }
+        
+        .marketplace-link:hover {
+            background: #c0392b;
+        }
+        
+        @media (max-width: 768px) {
+            .admin-container {
+                padding: 10px;
+            }
+            
+            .admin-header h1 {
+                font-size: 2rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .data-section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Header -->
+        <div class="admin-header">
+            <h1>📊 Panel Administrativo</h1>
+            <p>Dashboard de control para Sun Depot - Gestión de calculadora solar y marketplace</p>
+            
+            <!-- Navigation -->
+            <div style="margin-top: 20px;">
+                <a href="/" class="nav-link">🏠 Ir al Sitio</a>
+                <a href="/admin/marketplace" class="nav-link marketplace-link">🛒 Marketplace Stats</a>
+            </div>
+        </div>
+        
+        <!-- Estadísticas Principales -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.total_calculations }}</div>
+                <div class="stat-label">Cálculos Realizados</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.total_subscribers }}</div>
+                <div class="stat-label">Suscriptores Activos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.total_clicks }}</div>
+                <div class="stat-label">Clicks en Partners</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">
+                    {% if stats.get('marketplace_clicks') is defined %}
+                        {{ stats.marketplace_clicks }}
+                    {% else %}
+                        0
+                    {% endif %}
+                </div>
+                <div class="stat-label">Clicks Marketplace</div>
+            </div>
+        </div>
+        
+        <!-- Cálculos Recientes -->
+        <div class="data-section">
+            <h2 class="section-title">🧮 Cálculos Recientes</h2>
+            {% if stats.recent_calculations %}
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Consumo (kWh)</th>
+                            <th>Ubicación</th>
+                            <th>Paneles Calculados</th>
+                            <th>Tipo Panel</th>
+                            <th>Sistema (kW)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for calc in stats.recent_calculations %}
+                        <tr>
+                            <td>{{ calc.created_at.strftime('%d/%m/%Y %H:%M') if calc.created_at else 'N/A' }}</td>
+                            <td>{{ calc.home_consumption or 'N/A' }}</td>
+                            <td>{{ calc.location or 'N/A' }}</td>
+                            <td><strong>{{ calc.panels_needed or 'N/A' }}</strong></td>
+                            <td>{{ calc.panel_type or 'N/A' }}</td>
+                            <td>{{ "%.1f"|format(calc.system_power_kw) if calc.system_power_kw else 'N/A' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="no-data">No hay cálculos recientes disponibles</div>
+            {% endif %}
+        </div>
+        
+        <!-- Partners Populares -->
+        <div class="data-section">
+            <h2 class="section-title">🏪 Partners Populares</h2>
+            {% if stats.popular_partners %}
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Partner</th>
+                            <th>Total Clicks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for partner in stats.popular_partners %}
+                        <tr>
+                            <td>{{ partner.partner }}</td>
+                            <td><strong>{{ partner.clicks }}</strong></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="no-data">No hay datos de partners disponibles</div>
+            {% endif %}
+        </div>
+        
+        <!-- Estadísticas de Paneles -->
+        <div class="data-section">
+            <h2 class="section-title">⚡ Estadísticas de Paneles</h2>
+            {% if stats.panel_stats %}
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Tipo de Panel</th>
+                            <th>Cálculos</th>
+                            <th>Promedio Paneles</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for panel in stats.panel_stats %}
+                        <tr>
+                            <td><strong>{{ panel.panel_type }}</strong></td>
+                            <td>{{ panel.count }}</td>
+                            <td>{{ "%.1f"|format(panel.avg_panels) if panel.avg_panels else 'N/A' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="no-data">No hay estadísticas de paneles disponibles</div>
+            {% endif %}
+        </div>
+        
+        <!-- Información del Sistema -->
+        <div class="data-section">
+            <h2 class="section-title">ℹ️ Información del Sistema</h2>
+            <table class="data-table">
+                <tbody>
+                    <tr>
+                        <td><strong>Estado del sistema:</strong></td>
+                        <td>🟢 Operativo</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Última actualización:</strong></td>
+                        <td>{{ moment().format('DD/MM/YYYY HH:mm') if moment else 'Tiempo real' }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Base de datos:</strong></td>
+                        <td>✅ Conectada</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Marketplace:</strong></td>
+                        <td>
+                            {% if stats.get('marketplace_clicks') is defined %}
+                                🟢 Activo
+                            {% else %}
+                                🟡 Pendiente migración
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

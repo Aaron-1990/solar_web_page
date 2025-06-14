@@ -57,6 +57,29 @@ class Calculation(db.Model):
     system_power_kw = db.Column(db.Float)
     roof_area_m2 = db.Column(db.Float)
 
+class MarketplaceClick(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    platform = db.Column(db.String(50), nullable=False)
+    product_id = db.Column(db.String(100), nullable=False)
+    product_name = db.Column(db.String(200))
+    product_price = db.Column(db.Float)
+    user_ip = db.Column(db.String(45))
+    user_agent = db.Column(db.String(500))
+    referrer = db.Column(db.String(500))
+    click_id = db.Column(db.String(100))
+    clicked_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'platform': self.platform,
+            'product_id': self.product_id,
+            'product_name': self.product_name,
+            'product_price': self.product_price,
+            'clicked_at': self.clicked_at.isoformat()
+        }
+
+
 # RUTA PRINCIPAL ACTUALIZADA
 @app.route('/')
 def index():
@@ -285,6 +308,135 @@ def get_partners_by_section(section):
             'error': str(e)
         }), 500
 
+@app.route('/api/track/marketplace-click', methods=['POST'])
+def track_marketplace_click():
+    """Endpoint para tracking de clicks en marketplace"""
+    try:
+        data = request.json
+        
+        # Validaciones básicas
+        required_fields = ['platform', 'product_id']
+        for field in required_fields:
+            if not data.get(field):
+                return jsonify({
+                    'success': False,
+                    'error': f'Campo requerido: {field}'
+                }), 400
+        
+        # Crear registro de click
+        marketplace_click = MarketplaceClick(
+            platform=data.get('platform'),
+            product_id=data.get('product_id'),
+            product_name=data.get('product_name'),
+            product_price=data.get('product_price'),
+            user_ip=request.remote_addr,
+            user_agent=request.headers.get('User-Agent', ''),
+            referrer=data.get('referrer', ''),
+            click_id=data.get('click_id')
+        )
+        
+        # Guardar en base de datos
+        try:
+            db.session.add(marketplace_click)
+            db.session.commit()
+            
+            # Analytics
+            analytics.track_marketplace_click(
+                data.get('platform'),
+                data.get('product_id'),
+                data.get('product_name')
+            )
+            
+            return jsonify({
+                'success': True,
+                'message': 'Click tracked successfully',
+                'click_id': marketplace_click.id
+            })
+            
+        except Exception as db_error:
+            db.session.rollback()
+            app.logger.error(f"Database error in marketplace tracking: {str(db_error)}")
+            return jsonify({
+                'success': False,
+                'error': 'Error saving tracking data'
+            }), 500
+            
+    except Exception as e:
+        app.logger.error(f"Error en tracking marketplace: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Error interno del servidor'
+        }), 500
+
+@app.route('/api/marketplace/stats')
+def get_marketplace_stats():
+    """Estadísticas del marketplace para dashboard"""
+    try:
+        # Stats básicas
+        total_clicks = MarketplaceClick.query.count()
+        
+        # Clicks por plataforma
+        platform_stats = db.session.query(
+            MarketplaceClick.platform,
+            db.func.count(MarketplaceClick.id).label('clicks')
+        ).group_by(MarketplaceClick.platform).all()
+        
+        # Productos más clickeados
+        popular_products = db.session.query(
+            MarketplaceClick.platform,
+            MarketplaceClick.product_id,
+            MarketplaceClick.product_name,
+            db.func.count(MarketplaceClick.id).label('clicks')
+        ).group_by(
+            MarketplaceClick.platform,
+            MarketplaceClick.product_id,
+            MarketplaceClick.product_name
+        ).order_by(db.func.count(MarketplaceClick.id).desc()).limit(10).all()
+        
+        # Clicks por día (últimos 30 días)
+        from datetime import datetime, timedelta
+        thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+        
+        daily_clicks = db.session.query(
+            db.func.date(MarketplaceClick.clicked_at).label('date'),
+            db.func.count(MarketplaceClick.id).label('clicks')
+        ).filter(
+            MarketplaceClick.clicked_at >= thirty_days_ago
+        ).group_by(
+            db.func.date(MarketplaceClick.clicked_at)
+        ).order_by('date').all()
+        
+        return jsonify({
+            'success': True,
+            'data': {
+                'total_clicks': total_clicks,
+                'platform_stats': [
+                    {'platform': stat.platform, 'clicks': stat.clicks}
+                    for stat in platform_stats
+                ],
+                'popular_products': [
+                    {
+                        'platform': prod.platform,
+                        'product_id': prod.product_id,
+                        'product_name': prod.product_name,
+                        'clicks': prod.clicks
+                    }
+                    for prod in popular_products
+                ],
+                'daily_clicks': [
+                    {'date': str(day.date), 'clicks': day.clicks}
+                    for day in daily_clicks
+                ]
+            }
+        })
+        
+    except Exception as e:
+        app.logger.error(f"Error getting marketplace stats: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Error al obtener estadísticas'
+        }), 500
+
 # Panel de administración (básico)
 @app.route('/admin')
 def admin_dashboard():
@@ -332,6 +484,43 @@ def admin_dashboard():
     except Exception as e:
         app.logger.error(f"Error in admin dashboard: {str(e)}")
         return jsonify({'error': 'Error loading dashboard'}), 500
+
+@app.route('/admin/marketplace')
+def admin_marketplace_simple():
+    """Vista simple de estadísticas de marketplace"""
+    try:
+        # Estadísticas básicas
+        total_clicks = MarketplaceClick.query.count()
+        
+        # Top 3 productos
+        top_products = db.session.query(
+            MarketplaceClick.platform,
+            MarketplaceClick.product_name,
+            db.func.count(MarketplaceClick.id).label('clicks')
+        ).group_by(
+            MarketplaceClick.platform,
+            MarketplaceClick.product_name
+        ).order_by(
+            db.func.count(MarketplaceClick.id).desc()
+        ).limit(3).all()
+        
+        # JSON response simple para empezar
+        return jsonify({
+            'marketplace_stats': {
+                'total_clicks': total_clicks,
+                'top_products': [
+                    {
+                        'platform': p.platform,
+                        'name': p.product_name,
+                        'clicks': p.clicks
+                    } for p in top_products
+                ]
+            }
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
 # Páginas informativas adicionales
 @app.route('/guias/<slug>')
@@ -433,6 +622,81 @@ def migrate_panels_db():
     except Exception as e:
         print(f"❌ Error in migration: {e}")
 
+@app.cli.command()
+def migrate_marketplace_db():
+    """Migrar base de datos para agregar tabla de marketplace"""
+    try:
+        # Crear tabla marketplace_click si no existe
+        db.create_all()
+        
+        # Verificar que la tabla se creó correctamente
+        from sqlalchemy import inspect
+        inspector = inspect(db.engine)
+        
+        if 'marketplace_click' in inspector.get_table_names():
+            print("✅ Tabla marketplace_click creada exitosamente")
+        else:
+            print("❌ Error: Tabla marketplace_click no se pudo crear")
+            
+        print("✅ Migración de marketplace completada")
+        
+    except Exception as e:
+        print(f"❌ Error en migración de marketplace: {e}")
+
+# Función auxiliar para generar productos de prueba
+def seed_marketplace_products():
+    """Generar productos de prueba para desarrollo"""
+    test_products = [
+        {
+            'platform': 'amazon',
+            'product_id': 'panel-400w',
+            'product_name': 'Panel Solar 400W Monocristalino',
+            'product_price': 4500.0
+        },
+        {
+            'platform': 'mercadolibre',
+            'product_id': 'kit-solar-5kw',
+            'product_name': 'Kit Solar Completo 5kW Residencial',
+            'product_price': 85000.0
+        },
+        {
+            'platform': 'temu',
+            'product_id': 'monitor-solar-wifi',
+            'product_name': 'Monitor Solar WiFi Inteligente',
+            'product_price': 850.0
+        }
+    ]
+    
+    for product in test_products:
+        # Simular click para prueba
+        test_click = MarketplaceClick(
+            platform=product['platform'],
+            product_id=product['product_id'],
+            product_name=product['product_name'],
+            product_price=product['product_price'],
+            user_ip='127.0.0.1',
+            user_agent='Test Agent',
+            referrer='test',
+            click_id=f"test_{product['product_id']}"
+        )
+        
+        db.session.add(test_click)
+    
+    try:
+        db.session.commit()
+        print("✅ Productos de prueba agregados al marketplace")
+    except Exception as e:
+        db.session.rollback()
+        print(f"❌ Error agregando productos de prueba: {e}")
+
+# Comando CLI para sembrar datos de prueba
+@app.cli.command()
+def seed_marketplace():
+    """Sembrar datos de prueba para marketplace"""
+    seed_marketplace_products()
+
+
+
 # VALIDACIÓN DE CONFIGURACIÓN AL INICIO
 def validate_panel_configuration():
     """Validar que la configuración de paneles esté correcta"""
@@ -457,37 +721,30 @@ def validate_panel_configuration():
         print(f"❌ Panel configuration validation failed: {e}")
         return False
 
-# ACTUALIZACIÓN DEL MÓDULO DE ANALYTICS
+# Actualizar la clase Analytics para incluir marketplace
 class Analytics:
-    """Módulo de analytics actualizado con información de paneles"""
+    """Módulo de analytics actualizado con marketplace"""
     
-    def track_calculation(self, result, panel_type=None):  # AGREGADO panel_type=None
-        # Tracking mejorado con información de paneles
+    def track_calculation(self, result, panel_type=None):
         print(f"✅ Calculation tracked:")
         print(f"  • Panels: {result.get('numberOfPanels')} x {panel_type or 'unknown'}")
         print(f"  • System: {result.get('systemPowerKw')} kW")
         print(f"  • Investment: ${result.get('netCost'):,.2f}")
         print(f"  • Annual savings: ${result.get('totalAnnualSavings'):,.2f}")
-        
-        # Aquí puedes integrar con servicios reales
-        # Ejemplo para enviar a webhook o servicio externo:
-        """
-        tracking_data = {
-            'event': 'solar_calculation_completed',
-            'panel_type': panel_type,
-            'panels_needed': result.get('numberOfPanels'),
-            'system_power_kw': result.get('systemPowerKw'),
-            'investment_amount': result.get('netCost'),
-            'annual_savings': result.get('totalAnnualSavings'),
-            'timestamp': datetime.utcnow().isoformat()
-        }
-        """
     
     def track_subscription(self, email, source):
         print(f"📧 Subscription tracked: {email} from {source}")
     
     def track_partner_click(self, partner, product):
         print(f"🔗 Partner click tracked: {partner} - {product}")
+    
+    def track_marketplace_click(self, platform, product_id, product_name):
+        """Nuevo: Tracking específico para marketplace"""
+        print(f"🛒 Marketplace click tracked:")
+        print(f"  • Platform: {platform}")
+        print(f"  • Product: {product_name} ({product_id})")
+        print(f"  • Timestamp: {datetime.utcnow().isoformat()}")
+
 
 # INICIALIZACIÓN CON VALIDACIÓN
 def initialize_app():

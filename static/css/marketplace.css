@@ -1,0 +1,686 @@
+/* ========================================
+   SECCIÓN MARKETPLACE - TIENDA
+   marketplace.css - Estilos para productos y plataformas
+   ======================================== */
+
+/* Sección principal del marketplace */
+.marketplace-section {
+    padding: 4rem 0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.marketplace-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #FF9900, #2ECC71, #3498db, #e74c3c);
+    background-size: 400% 100%;
+    animation: marketplaceGradient 8s ease infinite;
+}
+
+@keyframes marketplaceGradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Header del marketplace */
+.marketplace-header {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+.marketplace-header .section-title {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-size: 2.5rem;
+}
+
+.marketplace-header .section-subtitle {
+    color: #666;
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+}
+
+/* Disclaimer de afiliados */
+.affiliate-disclaimer {
+    background: linear-gradient(135deg, #fff3cd, #ffffff);
+    border: 1px solid #ffeaa7;
+    border-left: 4px solid #f39c12;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 2rem auto;
+    max-width: 800px;
+    box-shadow: 0 4px 15px rgba(243, 156, 18, 0.1);
+}
+
+.affiliate-disclaimer p {
+    margin: 0;
+    color: #856404;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.affiliate-disclaimer strong {
+    color: #f39c12;
+}
+
+/* Subsecciones del marketplace */
+.marketplace-subsection {
+    margin-bottom: 4rem;
+    background: white;
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+    position: relative;
+    overflow: hidden;
+}
+
+.marketplace-subsection::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    border-radius: 20px 20px 0 0;
+}
+
+.amazon-section::before {
+    background: linear-gradient(90deg, #FF9900, #FFB84D);
+}
+
+.mercadolibre-section::before {
+    background: linear-gradient(90deg, #3483fa, #1259c3);
+}
+
+.temu-section::before {
+    background: linear-gradient(90deg, #FF6B35, #F7931E);
+}
+
+/* Headers de plataformas */
+.subsection-header {
+    margin-bottom: 2.5rem;
+}
+
+.platform-badge {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #f8f9fa, #ffffff);
+    border-radius: 16px;
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.platform-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.platform-logo {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    border-radius: 12px;
+    background: white;
+    padding: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.platform-info h3 {
+    margin: 0 0 0.75rem 0;
+    color: #2c3e50;
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.platform-benefits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.benefit-tag {
+    background: #e8f5e8;
+    color: #2ECC71;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid rgba(46, 204, 113, 0.2);
+}
+
+/* Grids de productos */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+/* Tarjetas de productos */
+.product-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    border: 1px solid #f0f0f0;
+}
+
+.product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+}
+
+/* Imagen del producto */
+.product-image {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+}
+
+.product-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-img {
+    transform: scale(1.05);
+}
+
+/* Badges y etiquetas */
+.discount-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: #e74c3c;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    z-index: 2;
+}
+
+.new-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: #2ECC71;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    z-index: 2;
+}
+
+.ml-plus-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: #00a650;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    z-index: 2;
+}
+
+.platform-tag {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.amazon-tag {
+    background: rgba(255, 153, 0, 0.9);
+    color: white;
+}
+
+.ml-tag {
+    background: rgba(52, 131, 250, 0.9);
+    color: white;
+}
+
+.temu-tag {
+    background: rgba(255, 107, 53, 0.9);
+    color: white;
+}
+
+.ali-tag {
+    background: rgba(231, 76, 60, 0.9);
+    color: white;
+}
+
+/* Información del producto */
+.product-info {
+    padding: 1.5rem;
+}
+
+.product-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Rating y reseñas */
+.product-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.stars {
+    color: #f39c12;
+    font-size: 0.9rem;
+}
+
+.reviews {
+    color: #666;
+    font-size: 0.85rem;
+}
+
+/* Precios */
+.product-pricing {
+    margin-bottom: 1rem;
+}
+
+.current-price {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #2ECC71;
+    margin-right: 0.5rem;
+}
+
+.original-price {
+    font-size: 1rem;
+    color: #999;
+    text-decoration: line-through;
+}
+
+.installments {
+    font-size: 0.85rem;
+    color: #2ECC71;
+    font-weight: 600;
+    margin-top: 0.25rem;
+}
+
+/* Características del producto */
+.product-features {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.feature {
+    font-size: 0.85rem;
+    color: #555;
+    display: flex;
+    align-items: center;
+}
+
+.feature::before {
+    content: '✓';
+    color: #2ECC71;
+    font-weight: 700;
+    margin-right: 0.5rem;
+}
+
+/* Botones CTA por plataforma */
+.cta-button {
+    width: 100%;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+}
+
+.cta-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.6s ease;
+}
+
+.cta-button:hover::before {
+    left: 100%;
+}
+
+.amazon-cta {
+    background: linear-gradient(135deg, #FF9900, #FFB84D);
+    color: white;
+}
+
+.amazon-cta:hover {
+    background: linear-gradient(135deg, #e8890a, #FF9900);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 153, 0, 0.3);
+}
+
+.ml-cta {
+    background: linear-gradient(135deg, #3483fa, #1259c3);
+    color: white;
+}
+
+.ml-cta:hover {
+    background: linear-gradient(135deg, #1259c3, #0039a6);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(52, 131, 250, 0.3);
+}
+
+.temu-cta {
+    background: linear-gradient(135deg, #FF6B35, #F7931E);
+    color: white;
+}
+
+.temu-cta:hover {
+    background: linear-gradient(135deg, #F7931E, #e8890a);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.3);
+}
+
+.ali-cta {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+}
+
+.ali-cta:hover {
+    background: linear-gradient(135deg, #c0392b, #a93226);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(231, 76, 60, 0.3);
+}
+
+/* Animaciones y estados de carga */
+.product-card.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.product-card.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    margin: -15px 0 0 -15px;
+    border: 3px solid #f0f0f0;
+    border-top: 3px solid #2ECC71;
+    border-radius: 50%;
+    animation: productSpin 1s linear infinite;
+    z-index: 10;
+}
+
+@keyframes productSpin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Estados especiales de productos */
+.product-card.featured {
+    border: 2px solid #2ECC71;
+    position: relative;
+}
+
+.product-card.featured::before {
+    content: '⭐ Recomendado';
+    position: absolute;
+    top: -12px;
+    left: 20px;
+    background: #2ECC71;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    z-index: 3;
+}
+
+.product-card.out-of-stock {
+    opacity: 0.6;
+}
+
+.product-card.out-of-stock .cta-button {
+    background: #95a5a6;
+    cursor: not-allowed;
+}
+
+.product-card.out-of-stock .cta-button:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .products-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .marketplace-section {
+        padding: 2rem 0;
+    }
+    
+    .marketplace-header .section-title {
+        font-size: 2rem;
+    }
+    
+    .marketplace-header .section-subtitle {
+        font-size: 1rem;
+    }
+    
+    .marketplace-subsection {
+        padding: 1.5rem;
+        margin-bottom: 2.5rem;
+        border-radius: 16px;
+    }
+    
+    .platform-badge {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+        padding: 1.25rem;
+    }
+    
+    .platform-logo {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .platform-info h3 {
+        font-size: 1.2rem;
+    }
+    
+    .platform-benefits {
+        justify-content: center;
+    }
+    
+    .products-grid {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+    }
+    
+    .product-image {
+        height: 180px;
+    }
+    
+    .product-info {
+        padding: 1.25rem;
+    }
+    
+    .product-title {
+        font-size: 1rem;
+    }
+    
+    .current-price {
+        font-size: 1.2rem;
+    }
+    
+    .affiliate-disclaimer {
+        padding: 1.25rem;
+        margin: 1.5rem auto;
+    }
+    
+    .affiliate-disclaimer p {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .marketplace-section {
+        padding: 1.5rem 0;
+    }
+    
+    .marketplace-subsection {
+        padding: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .platform-badge {
+        padding: 1rem;
+    }
+    
+    .platform-logo {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .platform-info h3 {
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .benefit-tag {
+        font-size: 0.75rem;
+        padding: 3px 8px;
+    }
+    
+    .product-image {
+        height: 160px;
+    }
+    
+    .product-info {
+        padding: 1rem;
+    }
+    
+    .product-features {
+        margin-bottom: 1.25rem;
+    }
+    
+    .feature {
+        font-size: 0.8rem;
+    }
+    
+    .cta-button {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Accessibility improvements */
+.cta-button:focus {
+    outline: 3px solid rgba(46, 204, 113, 0.5);
+    outline-offset: 2px;
+}
+
+.product-card:focus-within {
+    outline: 2px solid #2ECC71;
+    outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .product-card {
+        border: 2px solid #333;
+    }
+    
+    .benefit-tag {
+        border: 1px solid #2ECC71;
+    }
+    
+    .platform-tag {
+        border: 1px solid white;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .product-card,
+    .cta-button,
+    .platform-badge {
+        transition: none;
+    }
+    
+    .product-card:hover {
+        transform: none;
+    }
+    
+    .cta-button:hover {
+        transform: none;
+    }
+    
+    @keyframes marketplaceGradient,
+    @keyframes productSpin {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}
+
+/* Print styles */
+@media print {
+    .marketplace-section {
+        background: white;
+        box-shadow: none;
+    }
+    
+    .cta-button {
+        background: #f0f0f0 !important;
+        color: #333 !important;
+    }
+    
+    .affiliate-disclaimer {
+        border: 2px solid #333;
+        background: white;
+    }
+}
