@@ -3,33 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Sun Depot - Calcula tu Ahorro Total{% endblock %}</title>
+    <title>{% block title %}Nova Solar MX - Calcula tu Ahorro Total{% endblock %}</title>
     
     <!-- Meta tags SEO -->
-    <meta name="description" content="{% block description %}Calcula cuántos paneles solares necesitas para tu hogar y vehículo eléctrico. Ahorra en electricidad y gasolina con energía solar.{% endblock %}">
-    <meta name="keywords" content="paneles solares, calculadora solar, energía solar México, vehículo eléctrico, ahorro energético">
-    <meta name="author" content="Sun Depot">
+    <meta name="description" content="{% block description %}Nova Solar MX - Calculadora solar profesional para México. Calcula cuántos paneles solares necesitas para tu hogar y vehículo eléctrico.{% endblock %}">
+    <meta name="keywords" content="paneles solares, calculadora solar, energía solar México, vehículo eléctrico, ahorro energético, Nova Solar MX">
+    <meta name="author" content="Nova Solar MX">
     
     <!-- Open Graph -->
-    <meta property="og:title" content="{% block og_title %}Sun Depot - Calcula tu Ahorro Total{% endblock %}">
-    <meta property="og:description" content="{% block og_description %}Descubre cuánto puedes ahorrar con paneles solares en tu hogar y vehículo eléctrico{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}Nova Solar MX - Calcula tu Ahorro Total{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Descubre cuánto puedes ahorrar con paneles solares en tu hogar y vehículo eléctrico con Nova Solar MX{% endblock %}">
     <meta property="og:image" content="{{ url_for('static', filename='images/og-image.jpg') }}">
     <meta property="og:url" content="{{ request.url }}">
     <meta property="og:type" content="website">
     
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{% block twitter_title %}Sun Depot{% endblock %}">
+    <meta name="twitter:title" content="{% block twitter_title %}Nova Solar MX{% endblock %}">
     <meta name="twitter:description" content="{% block twitter_description %}Calcula tu ahorro con energía solar{% endblock %}">
     <meta name="twitter:image" content="{{ url_for('static', filename='images/twitter-card.jpg') }}">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://novasolarmx.com{{ request.path }}">
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
     
     <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-    <!-- NUEVO: CSS modular para paneles -->
+    <!-- CSS modular para paneles -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/panels.css') }}">
+    <!-- CSS modular para marketplace -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/marketplace.css') }}">
     {% block extra_css %}{% endblock %}
     
     <!-- Google Analytics -->
@@ -68,15 +73,16 @@
         <nav class="navbar">
             <div class="container">
                 <a href="{{ url_for('index') }}" class="logo">
-                    <img src="{{ url_for('static', filename='images/logo3.png') }}" alt="Sun Depot Logo">
+                    <img src="{{ url_for('static', filename='images/logo3.png') }}" alt="Nova Solar MX Logo">
                     <div class="logo-text">
-                        <h1 class="logo-name">SUN DEPOT</h1>
-                        <p class="logo-tagline">Premium Solar Solutions</p>
+                        <h1 class="logo-name">NOVA SOLAR MX</h1>
+                        <p class="logo-tagline">Energía Solar Premium</p>
                     </div>
                 </a>
                 <ul class="nav-menu">
                     <li><a href="#calculator">Calculadora</a></li>
                     <li><a href="#equipamiento">Equipamiento</a></li>
+                    <li><a href="#tienda">Tienda</a></li>
                     <li><a href="#beneficios">Beneficios</a></li>
                     <li><a href="#incentivos">Incentivos</a></li>
                     <li><a href="{{ url_for('guide_page', slug='como-calcular-paneles-solares') }}">Guías</a></li>
@@ -100,8 +106,12 @@
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-column">
-                    <h4>Sun Depot</h4>
-                    <p>Tu guía completa para la transición a energía solar y movilidad eléctrica en México.</p>
+                    <h4>Nova Solar MX</h4>
+                    <p>Tu guía completa para la transición a energía solar y movilidad eléctrica en México. Soluciones profesionales de energía renovable.</p>
+                    <div class="contact-info">
+                        <p>📧 <a href="mailto:mxnovasun@outlook.com">mxnovasun@outlook.com</a></p>
+                        <p>🌐 <a href="https://novasolarmx.com">novasolarmx.com</a></p>
+                    </div>
                     <div class="social-links">
                         <a href="#" aria-label="Facebook">📘</a>
                         <a href="#" aria-label="Twitter">🐦</a>
@@ -122,9 +132,9 @@
                     <h4>Herramientas</h4>
                     <ul>
                         <li><a href="#calculator">Calculadora Solar</a></li>
-                        <li><a href="/api/docs">API para Desarrolladores</a></li>
+                        <li><a href="#tienda">Tienda Online</a></li>
                         <li><a href="#newsletter">Newsletter</a></li>
-                        <li><a href="/blog">Blog</a></li>
+                        <li><a href="/admin">Panel Admin</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
@@ -133,12 +143,12 @@
                         <li><a href="/privacidad">Política de Privacidad</a></li>
                         <li><a href="/terminos">Términos de Uso</a></li>
                         <li><a href="/afiliados">Programa de Afiliados</a></li>
-                        <li><a href="/contacto">Contacto</a></li>
+                        <li><a href="mailto:mxnovasun@outlook.com">Contacto</a></li>
                     </ul>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2025 Sun Depot. Todos los derechos reservados.</p>
+                <p>&copy; 2025 Nova Solar MX. Todos los derechos reservados.</p>
                 <p class="disclaimer">Este sitio contiene enlaces de afiliados. Podemos recibir una comisión por compras realizadas a través de estos enlaces.</p>
             </div>
         </div>
@@ -146,20 +156,27 @@
 
     <!-- Scripts -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    <!-- NUEVO: JavaScript modular para paneles -->
+    <!-- JavaScript modular para paneles -->
     <script src="{{ url_for('static', filename='js/panels.js') }}"></script>
+    <!-- JavaScript modular para marketplace -->
+    <script src="{{ url_for('static', filename='js/marketplace.js') }}"></script>
     {% block extra_js %}{% endblock %}
     
     <!-- Schema.org Markup -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
-        "@type": "WebSite",
-        "name": "Sun Depot",
-        "url": "{{ request.url_root }}",
+        "@type": "Organization",
+        "name": "Nova Solar MX",
+        "url": "https://novasolarmx.com",
+        "logo": "https://novasolarmx.com/static/images/logo3.png",
+        "description": "Soluciones profesionales de energía solar en México. Calculadora solar, equipamiento premium y consultoría especializada.",
+        "email": "mxnovasun@outlook.com",
+        "areaServed": "Mexico",
+        "serviceType": "Energía Solar",
         "potentialAction": {
             "@type": "SearchAction",
-            "target": "{{ request.url_root }}buscar?q={search_term_string}",
+            "target": "https://novasolarmx.com/buscar?q={search_term_string}",
             "query-input": "required name=search_term_string"
         }
     }
