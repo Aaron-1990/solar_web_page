@@ -492,11 +492,17 @@ def google_verification():
     """Verificación de Google Search Console"""
     return app.send_static_file('google0ef2424a6acb9a1b.html')
 
-# Agregar después de la ruta de Google verification
 @app.route('/sitemap.xml')
 def sitemap():
-    """Servir sitemap.xml para SEO"""
-    return app.send_static_file('sitemap.xml'), 200, {'Content-Type': 'application/xml'}
+    """Servir sitemap.xml para SEO con headers correctos"""
+    try:
+        response = app.send_static_file('sitemap.xml')
+        response.headers['Content-Type'] = 'application/xml; charset=utf-8'
+        response.headers['Cache-Control'] = 'public, max-age=3600'
+        return response
+    except Exception as e:
+        app.logger.error(f"Error serving sitemap: {e}")
+        return "Sitemap not found", 404
 
 # Agregar en app.py después de la ruta del sitemap
 @app.route('/robots.txt')
