@@ -519,11 +519,6 @@ def robots_txt():
         app.logger.error(f"Error serving robots.txt: {e}")
         return "robots.txt not found", 404
 
-# Agregar en app.py después de la ruta del sitemap
-@app.route('/robots.txt')
-def robots_txt():
-    """Servir robots.txt para SEO"""
-    return app.send_static_file('robots.txt'), 200, {'Content-Type': 'text/plain'}
 
 @app.route('/admin/marketplace')
 def admin_marketplace_simple():
