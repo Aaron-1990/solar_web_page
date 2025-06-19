@@ -485,6 +485,13 @@ def admin_dashboard():
         app.logger.error(f"Error in admin dashboard: {str(e)}")
         return jsonify({'error': 'Error loading dashboard'}), 500
 
+# Agregar a app.py para comprobar a google propiedad del dominio.
+# Agregar ANTES de if __name__ == '__main__':
+@app.route('/google0ef2424a6acb9a1b.html')
+def google_verification():
+    """Verificación de Google Search Console"""
+    return app.send_static_file('google0ef2424a6acb9a1b.html')
+
 @app.route('/admin/marketplace')
 def admin_marketplace_simple():
     """Vista simple de estadísticas de marketplace"""
@@ -766,11 +773,6 @@ def initialize_app():
 
 # Llamar inicialización
 initialize_app()
-
-# Agregar a app.py para comprobar a google propiedad del dominio.
-@app.route('/google0ef2424a6acb9a1b.html')
-def google_verification():
-    return app.send_static_file('google0ef2424a6acb9a1b.html')
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
