@@ -492,6 +492,18 @@ def google_verification():
     """Verificación de Google Search Console"""
     return app.send_static_file('google0ef2424a6acb9a1b.html')
 
+# Agregar después de la ruta de Google verification
+@app.route('/sitemap.xml')
+def sitemap():
+    """Servir sitemap.xml para SEO"""
+    return app.send_static_file('sitemap.xml'), 200, {'Content-Type': 'application/xml'}
+
+# Agregar en app.py después de la ruta del sitemap
+@app.route('/robots.txt')
+def robots_txt():
+    """Servir robots.txt para SEO"""
+    return app.send_static_file('robots.txt'), 200, {'Content-Type': 'text/plain'}
+
 @app.route('/admin/marketplace')
 def admin_marketplace_simple():
     """Vista simple de estadísticas de marketplace"""
