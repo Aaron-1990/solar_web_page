@@ -497,12 +497,27 @@ def sitemap():
     """Servir sitemap.xml para SEO con headers correctos"""
     try:
         response = app.send_static_file('sitemap.xml')
+        # ✅ CORRECCIÓN: Content-Type correcto para XML
         response.headers['Content-Type'] = 'application/xml; charset=utf-8'
-        response.headers['Cache-Control'] = 'public, max-age=3600'
+        response.headers['Cache-Control'] = 'public, max-age=3600'  # Cache por 1 hora
+        response.headers['X-Robots-Tag'] = 'noindex'  # Evitar indexación del sitemap mismo
         return response
     except Exception as e:
         app.logger.error(f"Error serving sitemap: {e}")
         return "Sitemap not found", 404
+
+# También verificar que la ruta de robots.txt tenga headers correctos:
+@app.route('/robots.txt')
+def robots_txt():
+    """Servir robots.txt para SEO con headers correctos"""
+    try:
+        response = app.send_static_file('robots.txt')
+        response.headers['Content-Type'] = 'text/plain; charset=utf-8'
+        response.headers['Cache-Control'] = 'public, max-age=86400'  # Cache por 24 horas
+        return response
+    except Exception as e:
+        app.logger.error(f"Error serving robots.txt: {e}")
+        return "robots.txt not found", 404
 
 # Agregar en app.py después de la ruta del sitemap
 @app.route('/robots.txt')
