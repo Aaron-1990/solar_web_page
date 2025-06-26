@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Sitemap location
-Sitemap: https://novasolarmx.com/sitemap.xml
+Sitemap: https://mxnovasun.com/sitemap.xml
 
 # Disallow admin areas
 Disallow: /admin/

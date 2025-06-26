@@ -6,7 +6,7 @@
 
   <!-- Página principal -->
   <url>
-    <loc>https://novasolarmx.com/</loc>
+    <loc>https://mxnovasun.com/</loc>
     <lastmod>2025-06-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
@@ -14,7 +14,7 @@
 
   <!-- Calculadora solar (sección específica) -->
   <url>
-    <loc>https://novasolarmx.com/#calculator</loc>
+    <loc>https://mxnovasun.com/#calculator</loc>
     <lastmod>2025-06-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
@@ -22,7 +22,7 @@
 
   <!-- Equipamiento solar -->
   <url>
-    <loc>https://novasolarmx.com/#equipamiento</loc>
+    <loc>https://mxnovasun.com/#equipamiento</loc>
     <lastmod>2025-06-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -30,7 +30,7 @@
 
   <!-- Tienda / Marketplace -->
   <url>
-    <loc>https://novasolarmx.com/#tienda</loc>
+    <loc>https://mxnovasun.com/#tienda</loc>
     <lastmod>2025-06-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -38,7 +38,7 @@
 
   <!-- Beneficios -->
   <url>
-    <loc>https://novasolarmx.com/#beneficios</loc>
+    <loc>https://mxnovasun.com/#beneficios</loc>
     <lastmod>2025-06-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -46,7 +46,7 @@
 
   <!-- Incentivos gubernamentales -->
   <url>
-    <loc>https://novasolarmx.com/#incentivos</loc>
+    <loc>https://mxnovasun.com/#incentivos</loc>
     <lastmod>2025-06-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -54,14 +54,14 @@
 
   <!-- Guías educativas -->
   <url>
-    <loc>https://novasolarmx.com/guias/como-calcular-paneles-solares</loc>
+    <loc>https://mxnovasun.com/guias/como-calcular-paneles-solares</loc>
     <lastmod>2025-06-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://novasolarmx.com/guias/beneficios-vehiculo-electrico</loc>
+    <loc>https://mxnovasun.com/guias/beneficios-vehiculo-electrico</loc>
     <lastmod>2025-06-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -69,28 +69,28 @@
 
   <!-- Herramientas de comparación -->
   <url>
-    <loc>https://novasolarmx.com/comparador/paneles</loc>
+    <loc>https://mxnovasun.com/comparador/paneles</loc>
     <lastmod>2025-06-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <url>
-    <loc>https://novasolarmx.com/comparador/inversores</loc>
+    <loc>https://mxnovasun.com/comparador/inversores</loc>
     <lastmod>2025-06-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <url>
-    <loc>https://novasolarmx.com/comparador/baterias</loc>
+    <loc>https://mxnovasun.com/comparador/baterias</loc>
     <lastmod>2025-06-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <url>
-    <loc>https://novasolarmx.com/comparador/vehiculos</loc>
+    <loc>https://mxnovasun.com/comparador/vehiculos</loc>
     <lastmod>2025-06-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -98,7 +98,7 @@
 
   <!-- Panel administrativo (low priority) -->
   <url>
-    <loc>https://novasolarmx.com/admin</loc>
+    <loc>https://mxnovasun.com/admin</loc>
     <lastmod>2025-06-17</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.1</priority>

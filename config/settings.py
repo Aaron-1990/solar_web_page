@@ -8,10 +8,10 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'nova-solar-mx-dev-key-2025'
     
     # Información de la empresa
-    COMPANY_NAME = 'Nova Solar MX'
-    SITE_NAME = 'Nova Solar MX'
-    SITE_URL = os.environ.get('SITE_URL') or 'https://novasolarmx.com'
-    DOMAIN = 'novasolarmx.com'
+    COMPANY_NAME = 'MX Nova Sun'
+    SITE_NAME = 'MX Nova Sun'
+    SITE_URL = os.environ.get('SITE_URL') or 'https://mxnovasun.com'
+    DOMAIN = 'mxnovasun.com'
     
     # Base de datos
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
@@ -43,7 +43,7 @@ class Config:
     ALIEXPRESS_AFFILIATE_ID = os.environ.get('ALIEXPRESS_AFFILIATE_ID')
     
     # SEO y meta tags
-    DEFAULT_META_TITLE = 'Nova Solar MX - Calculadora Solar Profesional'
+    DEFAULT_META_TITLE = 'MX Nova Sun - Calculadora Solar Profesional'
     DEFAULT_META_DESCRIPTION = 'La calculadora solar más avanzada de México. Calcula tu sistema solar para hogar y vehículo eléctrico. Equipos premium, incentivos gubernamentales.'
     DEFAULT_KEYWORDS = 'paneles solares, energía solar México, calculadora solar, vehículo eléctrico, Nova Solar MX'
     
