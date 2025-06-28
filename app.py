@@ -111,7 +111,7 @@ def calculate_solar():
         data = request.json
         
         # Extraer datos del request
-        home_consumption = float(data.get('homeConsumption', 400))
+        home_consumption = float(data.get('homeConsumption', 0))
         location = data.get('location')
         coverage = float(data.get('coverage', 100)) / 100
         vehicle_model = data.get('vehicleModel', '')

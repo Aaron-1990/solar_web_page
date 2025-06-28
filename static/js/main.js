@@ -44,7 +44,7 @@ async function calculateIntegral() {
     }
     // Obtener valores del formulario
     const formData = {
-        homeConsumption: parseFloat(document.getElementById('homeConsumption').value) || 400,
+        homeConsumption: parseFloat(document.getElementById('homeConsumption').value) || 0,
         location: document.getElementById('location').value,
         coverage: parseFloat(document.getElementById('coverage').value),
         vehicleModel: document.getElementById('vehicleModel').value,
@@ -129,7 +129,7 @@ async function calculateIntegralNew() {
         
         // Preparar datos del formulario
         const formData = {
-            homeConsumption: parseFloat(document.getElementById('homeConsumption').value) || 400,
+            homeConsumption: parseFloat(document.getElementById('homeConsumption').value) || 0,
             location: document.getElementById('location').value,
             coverage: parseFloat(document.getElementById('coverage').value),
             panelType: panelConfig ? panelConfig.panelType : (document.getElementById('panelType')?.value || '500w')
@@ -854,7 +854,7 @@ function createNotification(message, type) {
 function updateCalculationPreview(panelData) {
     // Esta función puede mostrar un preview en tiempo real
     // de cómo afecta el cambio de panel al cálculo
-    const homeConsumption = parseFloat(document.getElementById('homeConsumption')?.value) || 400;
+    const homeConsumption = parseFloat(document.getElementById('homeConsumption')?.value) || 0;
     const locationSelect = document.getElementById('location');
     const hsp = locationSelect?.options[locationSelect.selectedIndex]?.dataset.hsp || 5.5;
     

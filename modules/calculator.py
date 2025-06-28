@@ -1,6 +1,7 @@
 import json
 import os
 from typing import Dict, Optional, List, Tuple
+import math
 
 class SolarCalculator:
     """
@@ -218,6 +219,7 @@ class SolarCalculator:
             
         return panels_needed_rounded, kwh_per_panel_bimestral_real
     
+
     def calculate_integral(self,
                     home_consumption: float,
                     location: str,
@@ -305,7 +307,7 @@ class SolarCalculator:
         
         # === NUEVO CÁLCULO DE PANELES USANDO FÓRMULA ESPECÍFICA ===
         number_of_panels, kwh_per_panel_bimestral = self.calculate_panels_needed_precise(
-            total_energy_needed_bimestral, hsp, panel_power_w
+        total_energy_needed_bimestral, hsp, panel_power_w
         )
         
         # Asegurar mínimo 1 panel si hay consumo
@@ -344,7 +346,7 @@ class SolarCalculator:
         
         # Área de techo requerida
         total_roof_area = number_of_panels * panel_area_m2
-        
+
         return {
             # Sistema
             "systemPowerKw": round(actual_system_power_kw, 2),
